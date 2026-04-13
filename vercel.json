@@ -2,18 +2,13 @@
   "rewrites": [
     { "source": "/api/detect", "destination": "/api/detect" },
     { "source": "/api/inspect", "destination": "/api/inspect" },
-    { "source": "/api/amw/period/:period", "destination": "/api/amw/period" },
-    { "source": "/api/locations", "destination": "/api/locations" }
+    { "source": "/api/locations", "destination": "/api/locations" },
+    { "source": "/api/amw/period/(.*)", "destination": "/api/amw/period?period=$1" }
   ],
   "functions": {
-    "api/detect.py": {
+    "api/**/*.py": {
+      "runtime": "@vercel/python@4.5.1",
       "maxDuration": 60
-    },
-    "api/inspect.py": {
-      "maxDuration": 60
-    },
-    "api/locations.py": {
-      "maxDuration": 10
     }
   }
 }
