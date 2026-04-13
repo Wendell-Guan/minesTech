@@ -217,6 +217,16 @@
       </div>
       <div id="detection-status" style="text-align:center;font-size:11px;color:#888;margin-top:8px;"></div>
     </div>
+
+    <div class="sidebar-section">
+      <h3>Go to Coordinates</h3>
+      <div style="display:flex;gap:6px;">
+        <input type="text" id="coord-lat" placeholder="Lat (e.g. 4.5)" style="flex:1;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+        <input type="text" id="coord-lon" placeholder="Lon (e.g. -55.2)" style="flex:1;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
+      </div>
+      <button onclick="goToCoords()" style="width:100%;margin-top:6px;padding:7px;background:#1a1a2e;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;">Go</button>
+      <div id="coord-display" style="text-align:center;font-size:11px;color:#888;margin-top:6px;"></div>
+    </div>
   </div>
 
   <div class="loading-overlay" id="loading">Loading tiles...</div>
@@ -274,6 +284,7 @@
       center: SURINAME_CENTER,
       zoom: SURINAME_ZOOM,
       maxBounds: [[-58.5, 1.5], [-53.5, 6.5]],
+      maxZoom: 15,
       attributionControl: false
     });
 
@@ -313,6 +324,7 @@
           id: 'confirmed-mining-layer',
           type: 'raster',
           source: 'confirmed-mining',
+          maxzoom: 14,
           paint: { 'raster-opacity': 0.8 }
         });
       } catch (err) {
@@ -365,6 +377,7 @@
         id: 'detected-mining-layer',
         type: 'raster',
         source: 'detected-mining',
+        maxzoom: 14,
         paint: { 'raster-opacity': opacity }
       });
     }
@@ -491,6 +504,54 @@
         map.setTerrain({ source: 'terrain-dem', exaggeration: parseFloat(val) });
       }
     }
+
+    // ── Coordinate Navigation ──
+
+    function goToCoords() {
+      const latStr = document.getElementById('coord-lat').value.trim();
+      const lonStr = document.getElementById('coord-lon').value.trim();
+      const display = document.getElementById('coord-display');
+
+      if (!latStr || !lonStr) {
+        display.textContent = 'Please enter both lat and lon';
+        display.style.color = '#af2a2a';
+        return;
+      }
+
+      const lat = parseFloat(latStr);
+      const lon = parseFloat(lonStr);
+
+      if (isNaN(lat) || isNaN(lon)) {
+        display.textContent = 'Invalid coordinates';
+        display.style.color = '#af2a2a';
+        return;
+      }
+
+      map.flyTo({ center: [lon, lat], zoom: 13, duration: 2000 });
+
+      // Drop a marker
+      if (window._coordMarker) window._coordMarker.remove();
+      window._coordMarker = new maplibregl.Marker({ color: '#e6a817' })
+        .setLngLat([lon, lat])
+        .setPopup(new maplibregl.Popup().setHTML(`<b>${lat.toFixed(5)}, ${lon.toFixed(5)}</b>`))
+        .addTo(map);
+      window._coordMarker.togglePopup();
+
+      display.textContent = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+      display.style.color = '#888';
+    }
+
+    // Enter key triggers Go
+    document.getElementById('coord-lat').addEventListener('keydown', e => { if (e.key === 'Enter') goToCoords(); });
+    document.getElementById('coord-lon').addEventListener('keydown', e => { if (e.key === 'Enter') goToCoords(); });
+
+    // Click on map shows coordinates
+    map.on('click', e => {
+      document.getElementById('coord-lat').value = e.lngLat.lat.toFixed(5);
+      document.getElementById('coord-lon').value = e.lngLat.lng.toFixed(5);
+      document.getElementById('coord-display').textContent = `${e.lngLat.lat.toFixed(5)}, ${e.lngLat.lng.toFixed(5)}`;
+      document.getElementById('coord-display').style.color = '#888';
+    });
   </script>
 </body>
 </html>
