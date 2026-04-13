@@ -457,6 +457,11 @@
         <span class="layer-color" style="background: linear-gradient(135deg, #2e7d32, #4caf50); border-radius:3px;"></span>
         <span style="font-size:12px;">Historical Satellite Imagery</span>
       </label>
+      <div class="opacity-control" id="basemap-opacity-control" style="display:none;">
+        <span>Blend</span>
+        <input type="range" id="opacity-basemap" min="0" max="100" value="70" oninput="setBasemapOpacity(this.value)">
+        <span id="opacity-basemap-val">70%</span>
+      </div>
       <div id="basemap-status" style="text-align:center;font-size:10px;color:#888;margin-top:2px;"></div>
     </div>
 
@@ -1401,7 +1406,7 @@ SPDD-002  Bob  672997  569499  -22.8  150.0
         id: 'historical-basemap-layer',
         type: 'raster',
         source: 'historical-basemap',
-        paint: { 'raster-opacity': 1.0 }
+        paint: { 'raster-opacity': parseInt(document.getElementById('opacity-basemap').value) / 100 }
       }, firstLayerId);
 
       basemapYear = year;
@@ -1410,13 +1415,23 @@ SPDD-002  Bob  672997  569499  -22.8  150.0
     function toggleHistoricalBasemap() {
       const on = document.getElementById('toggle-historical-basemap').checked;
       const status = document.getElementById('basemap-status');
+      const opCtrl = document.getElementById('basemap-opacity-control');
       if (on) {
+        if (opCtrl) opCtrl.style.display = '';
         loadHistoricalBasemap(currentDetectionYear);
       } else {
+        if (opCtrl) opCtrl.style.display = 'none';
         if (map.getLayer('historical-basemap-layer')) map.removeLayer('historical-basemap-layer');
         if (map.getSource('historical-basemap')) map.removeSource('historical-basemap');
         basemapYear = null;
         if (status) status.textContent = '';
+      }
+    }
+
+    function setBasemapOpacity(val) {
+      document.getElementById('opacity-basemap-val').textContent = val + '%';
+      if (map.getLayer('historical-basemap-layer')) {
+        map.setPaintProperty('historical-basemap-layer', 'raster-opacity', parseInt(val) / 100);
       }
     }
 
