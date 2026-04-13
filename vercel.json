@@ -1,17 +1,5 @@
 {
   "framework": null,
   "buildCommand": "",
-  "outputDirectory": "",
-  "rewrites": [
-    { "source": "/api/detect", "destination": "/api/detect" },
-    { "source": "/api/inspect", "destination": "/api/inspect" },
-    { "source": "/api/locations", "destination": "/api/locations" },
-    { "source": "/api/amw/period/(.*)", "destination": "/api/amw/period?period=$1" }
-  ],
-  "functions": {
-    "api/**/*.py": {
-      "runtime": "@vercel/python@4.5.1",
-      "maxDuration": 60
-    }
-  }
+  "outputDirectory": "."
 }
