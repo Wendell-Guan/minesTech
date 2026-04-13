@@ -101,6 +101,175 @@
     }
     .loading-overlay.active { display: block; }
 
+    /* Basemap loading toast */
+    .basemap-toast {
+      position: absolute; bottom: 40px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: rgba(26, 26, 46, 0.85); color: #fff;
+      padding: 7px 18px; border-radius: 20px;
+      font-size: 12px; z-index: 20;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.3s, transform 0.3s;
+      white-space: nowrap;
+    }
+    .basemap-toast.show {
+      opacity: 1; transform: translateX(-50%) translateY(0);
+    }
+    .basemap-toast .spinner {
+      display: inline-block; width: 10px; height: 10px;
+      border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+      border-radius: 50%; margin-right: 6px; vertical-align: middle;
+      animation: toast-spin 0.8s linear infinite;
+    }
+    @keyframes toast-spin { to { transform: rotate(360deg); } }
+
+    .inspect-note {
+      margin-top: 8px;
+      font-size: 11px;
+      color: #777;
+      line-height: 1.45;
+    }
+
+    .inspect-popup {
+      font-size: 12px;
+      line-height: 1.45;
+      min-width: 250px;
+    }
+    .inspect-popup h4 {
+      font-size: 13px;
+      margin-bottom: 6px;
+      color: #1a1a2e;
+    }
+    .inspect-popup .summary {
+      margin-bottom: 8px;
+      color: #444;
+    }
+    .inspect-popup .metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 8px;
+      margin-bottom: 8px;
+    }
+    .inspect-popup .metric {
+      white-space: nowrap;
+    }
+    .inspect-popup .rule-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+    }
+    .inspect-popup .rule-pill {
+      border-radius: 999px;
+      padding: 2px 6px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+    .inspect-popup .rule-pass {
+      background: #e8f6ec;
+      color: #146c2e;
+    }
+    .inspect-popup .rule-fail {
+      background: #fde8e8;
+      color: #9d2525;
+    }
+
+    /* Saved locations */
+    .saved-list { max-height: 180px; overflow-y: auto; }
+    .saved-item {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 0; font-size: 12px; border-bottom: 1px solid #f0f0f0;
+    }
+    .saved-item:last-child { border-bottom: none; }
+    .saved-item .saved-color {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    }
+    .saved-item .saved-name {
+      flex: 1; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .saved-item .saved-name:hover { color: #e6a817; }
+    .saved-item .saved-coords { font-size: 10px; color: #999; flex-shrink: 0; }
+    .saved-item .saved-del {
+      width: 18px; height: 18px; border: none; background: none;
+      color: #ccc; font-size: 14px; cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; border-radius: 4px;
+    }
+    .saved-item .saved-del:hover { color: #af2a2a; background: #fde8e8; }
+    .saved-item .saved-edit {
+      width: 18px; height: 18px; border: none; background: none;
+      color: #ccc; font-size: 12px; cursor: pointer; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; border-radius: 4px;
+    }
+    .saved-item .saved-edit:hover { color: #1a1a2e; background: #eef; }
+    .saved-note { font-size: 10px; color: #888; font-style: italic; padding-left: 16px; margin-top: -2px; margin-bottom: 2px; }
+    .saved-empty { font-size: 11px; color: #aaa; text-align: center; padding: 8px 0; }
+    .saved-actions { display: flex; gap: 6px; margin-top: 8px; }
+    .saved-actions button {
+      flex: 1; padding: 5px; border-radius: 6px; font-size: 11px; cursor: pointer;
+    }
+    .btn-download { background: #1a1a2e; color: #fff; border: none; }
+    .btn-clear-saved { background: transparent; color: #888; border: 1px solid #ddd; }
+    .form-input {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 12px;
+      margin-top: 6px;
+    }
+    .saved-plots-list { max-height: 180px; overflow-y: auto; }
+    .saved-plot-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 7px 0; font-size: 12px; border-bottom: 1px solid #f0f0f0;
+    }
+    .saved-plot-color { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+    .saved-plot-name { flex: 1; cursor: pointer; color: #444; font-weight: 600; }
+    .saved-plot-name:hover { color: #e6a817; }
+    .saved-plot-btn {
+      border: none; background: #f6f6f6; border-radius: 4px;
+      font-size: 11px; cursor: pointer; color: #666; padding: 3px 6px;
+    }
+    .saved-plot-btn:hover { background: #eee; }
+    .saved-plot-note { font-size: 11px; color: #777; padding: 0 0 8px 20px; line-height: 1.4; }
+
+    /* AMW Period selector */
+    .amw-mode-toggle {
+      display: flex; gap: 0; margin: 8px 0 6px 0; border-radius: 6px; overflow: hidden;
+      border: 1px solid #e0e0e0;
+    }
+    .amw-mode-btn {
+      flex: 1; padding: 5px 0; font-size: 11px; font-weight: 600; text-align: center;
+      cursor: pointer; border: none; background: #f5f5f5; color: #888; transition: all 0.15s;
+    }
+    .amw-mode-btn.active { background: #1565C0; color: #fff; }
+    .amw-period-btns {
+      display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap;
+    }
+    .amw-period-btn {
+      flex: 1; min-width: 60px; padding: 4px 6px; font-size: 10px; font-weight: 600;
+      text-align: center; cursor: pointer; border: 1px solid #bbdefb;
+      border-radius: 5px; background: #e3f2fd; color: #1565c0; transition: all 0.15s;
+    }
+    .amw-period-btn.active { background: #1565C0; color: #fff; border-color: #1565C0; }
+    .amw-period-btn:hover { background: #bbdefb; }
+    .amw-period-btn.active:hover { background: #1565C0; }
+    .amw-nav-btn {
+      width: 24px; height: 28px; border: 1px solid #e0e0e0; border-radius: 5px;
+      background: #fff; color: #666; font-size: 16px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .amw-nav-btn:hover { background: #f0f0f0; }
+    .amw-period-status {
+      font-size: 10px; color: #888; text-align: center; margin-top: 4px; min-height: 14px;
+    }
+
+    /* Ruler / measurement */
+    .ruler-result {
+      margin-top: 6px; font-size: 11px; color: #444;
+      text-align: center; min-height: 16px;
+    }
+
     /* Info badge */
     .info-badge {
       position: absolute; bottom: 30px; left: 12px;
@@ -159,11 +328,23 @@
         <span style="font-size:16px;">🏔</span>
         <span>3D Terrain</span>
       </label>
+      <label class="layer-toggle" style="margin-top:8px;">
+        <input type="checkbox" id="toggle-inspect" onchange="toggleInspectMode()">
+        <span style="font-size:16px;">⌖</span>
+        <span>Point Inspect</span>
+      </label>
+      <div class="inspect-note" id="inspect-status">Off. Enable Point Inspect, then click the map.</div>
       <div class="opacity-control" id="exaggeration-control" style="display:none;">
         <span>Height</span>
         <input type="range" id="exaggeration-slider" min="1" max="5" value="2" step="0.5" oninput="setExaggeration(this.value)">
         <span id="exaggeration-val">2x</span>
       </div>
+      <label class="layer-toggle" style="margin-top:8px;">
+        <input type="checkbox" id="toggle-ruler" onchange="toggleRuler()">
+        <span style="font-size:16px;">📏</span>
+        <span>Measure Distance</span>
+      </label>
+      <div class="ruler-result" id="ruler-result"></div>
     </div>
 
     <div class="sidebar-section">
@@ -190,6 +371,38 @@
         <input type="range" id="opacity-detected" min="0" max="100" value="80" oninput="setDetectedOpacity(this.value)">
         <span id="opacity-detected-val">80%</span>
       </div>
+
+      <label class="layer-toggle" style="margin-top:10px;">
+        <input type="checkbox" id="toggle-amw" checked onchange="toggleAMW()">
+        <span class="layer-color" style="background: #2196F3;"></span>
+        <span>Amazon Mining Watch</span>
+      </label>
+      <div class="amw-mode-toggle">
+        <button class="amw-mode-btn active" id="amw-mode-cum" onclick="setAMWMode('cumulative')">Cumulative</button>
+        <button class="amw-mode-btn" id="amw-mode-single" onclick="setAMWMode('single')">Single period</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:2px;margin-top:6px;">
+        <button class="amw-nav-btn" onclick="amwPeriodNav(-1)" title="Previous">&#8249;</button>
+        <div class="amw-period-btns" id="amw-period-btns"></div>
+        <button class="amw-nav-btn" onclick="amwPeriodNav(1)" title="Next">&#8250;</button>
+      </div>
+      <div class="amw-period-status" id="amw-period-status"></div>
+      <div class="opacity-control">
+        <span>Opacity</span>
+        <input type="range" id="opacity-amw" min="0" max="100" value="70" oninput="setAMWOpacity(this.value)">
+        <span id="opacity-amw-val">70%</span>
+      </div>
+
+      <label class="layer-toggle" style="margin-top:10px;">
+        <input type="checkbox" id="toggle-timeline" onchange="toggleTimeline()">
+        <span class="layer-color" style="background: linear-gradient(to right, #1a237e, #4a148c, #b71c1c); border-radius:3px;"></span>
+        <span>Mining Timeline</span>
+      </label>
+      <div class="opacity-control">
+        <span>Opacity</span>
+        <input type="range" id="opacity-timeline" min="0" max="100" value="80" oninput="setTimelineOpacity(this.value)">
+        <span id="opacity-timeline-val">80%</span>
+      </div>
     </div>
 
     <div class="sidebar-section">
@@ -204,18 +417,47 @@
         <span>Detected Mining</span>
         <span class="legend-tag tag-detected">Sentinel-2</span>
       </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: linear-gradient(to right, #FFF9C4, #FFD54F, #EF5350); border-radius:3px;"></div>
+        <span>AI Detected Mining</span>
+        <span class="legend-tag" style="background:#FFF9C4;color:#C62828;" id="amw-legend-tag">AMW Cum.</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;padding:2px 0 0 20px;font-size:10px;color:#888;">
+        <span style="width:18px;height:8px;background:#FFF9C4;border:1px solid #F9A825;border-radius:2px;display:inline-block;"></span>Older
+        <span style="width:18px;height:8px;background:#FFD54F;border:1px solid #F57F17;border-radius:2px;display:inline-block;margin-left:2px;"></span>
+        <span style="width:18px;height:8px;background:#EF5350;border:1px solid #C62828;border-radius:2px;display:inline-block;margin-left:2px;"></span>Recent
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: linear-gradient(to right, #1a237e, #b71c1c); border-radius:3px;"></div>
+        <span>Mining Timeline</span>
+        <span class="legend-tag" style="background:#f3e5f5;color:#4a148c;">2018–23</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:3px;padding:4px 0 0 20px;font-size:10px;color:#888;">
+        <span style="width:14px;height:8px;background:#1a237e;border-radius:2px;display:inline-block;"></span>2018
+        <span style="width:14px;height:8px;background:#4a148c;border-radius:2px;display:inline-block;margin-left:2px;"></span>19
+        <span style="width:14px;height:8px;background:#880e4f;border-radius:2px;display:inline-block;margin-left:2px;"></span>20
+        <span style="width:14px;height:8px;background:#bf360c;border-radius:2px;display:inline-block;margin-left:2px;"></span>21
+        <span style="width:14px;height:8px;background:#e65100;border-radius:2px;display:inline-block;margin-left:2px;"></span>22
+        <span style="width:14px;height:8px;background:#f44336;border-radius:2px;display:inline-block;margin-left:2px;"></span>23
+      </div>
     </div>
 
     <div class="year-control">
       <h3 style="font-size:12px;text-transform:uppercase;color:#888;letter-spacing:0.5px;margin-bottom:10px;">Detection Year</h3>
       <div class="year-display" id="year-display">2024</div>
-      <input type="range" class="year-slider" id="year-slider" min="2024" max="2026" value="2024" step="1" oninput="onYearChange(this.value)">
+      <input type="range" class="year-slider" id="year-slider" min="2018" max="2026" value="2024" step="1" oninput="onYearChange(this.value)">
       <div class="year-range">
-        <span>2024</span>
-        <span>2025</span>
+        <span>2018</span>
+        <span>2022</span>
         <span>2026</span>
       </div>
       <div id="detection-status" style="text-align:center;font-size:11px;color:#888;margin-top:8px;"></div>
+      <label class="layer-toggle" style="margin-top:8px;">
+        <input type="checkbox" id="toggle-historical-basemap" onchange="toggleHistoricalBasemap()">
+        <span class="layer-color" style="background: linear-gradient(135deg, #2e7d32, #4caf50); border-radius:3px;"></span>
+        <span style="font-size:12px;">Historical Satellite Imagery</span>
+      </label>
+      <div id="basemap-status" style="text-align:center;font-size:10px;color:#888;margin-top:2px;"></div>
     </div>
 
     <div class="sidebar-section">
@@ -227,9 +469,75 @@
       <button onclick="goToCoords()" style="width:100%;margin-top:6px;padding:7px;background:#1a1a2e;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;">Go</button>
       <div id="coord-display" style="text-align:center;font-size:11px;color:#888;margin-top:6px;"></div>
     </div>
+
+    <div class="sidebar-section">
+      <h3>Saved Locations</h3>
+      <div class="saved-list" id="saved-list">
+        <div class="saved-empty">No saved locations yet</div>
+      </div>
+      <div class="saved-actions">
+        <button class="btn-download" onclick="downloadSaved()">Download</button>
+        <button class="btn-clear-saved" onclick="clearAllSaved()">Clear All</button>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <h3>Import DMS Coordinates</h3>
+      <textarea id="dms-input" rows="8" placeholder="Paste DMS points, e.g.:
+A. 5° 9' 41.42&quot;
+B. 5° 9' 41.13&quot;
+C. 5° 8' 31.35&quot;
+D. 5° 8' 32.44&quot;
+55° 26' 28.40&quot; W
+55° 26' 1.01&quot; W
+55° 25' 59.88&quot; W
+55° 26' 28.28&quot; W
+
+Suriname mode:
+- 5°... is treated as latitude
+- 55°... is treated as longitude" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:11px;font-family:monospace;resize:vertical;box-sizing:border-box;"></textarea>
+      <input type="text" id="dms-name" class="form-input" placeholder="Area name (e.g. Renarte block A)">
+      <input type="text" id="dms-note" class="form-input" placeholder="Note / remark">
+      <button onclick="importDMS()" style="width:100%;margin-top:6px;padding:7px;background:#1a1a2e;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;">Import & Plot</button>
+      <button onclick="saveCurrentPlot()" style="width:100%;margin-top:4px;padding:7px;background:#e6a817;color:#1a1a2e;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">Save Area</button>
+      <button onclick="clearPlot()" style="width:100%;margin-top:4px;padding:5px;background:transparent;color:#888;border:1px solid #ddd;border-radius:6px;font-size:11px;cursor:pointer;">Clear Plot</button>
+      <div id="dms-status" style="text-align:center;font-size:11px;color:#888;margin-top:6px;"></div>
+    </div>
+
+    <div class="sidebar-section">
+      <h3>Saved Areas</h3>
+      <div class="saved-plots-list" id="saved-plots-list">
+        <div class="saved-empty">No saved areas yet</div>
+      </div>
+      <div class="saved-actions">
+        <button class="btn-download" onclick="downloadSavedPlots()">Download</button>
+        <button class="btn-clear-saved" onclick="clearAllSavedPlots()">Clear All</button>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <h3>Import Drill Holes (UTM)</h3>
+      <textarea id="utm-input" rows="6" placeholder="Paste table data, e.g.:
+SPDD-001  Bob  672975  569515  -23.1  162.0
+SPDD-002  Bob  672997  569499  -22.8  150.0
+(Hole ID, Target, Easting, Northing, Elev, EOH)" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:11px;font-family:monospace;resize:vertical;box-sizing:border-box;"></textarea>
+      <div style="display:flex;gap:6px;margin-top:6px;">
+        <label style="font-size:11px;color:#666;display:flex;align-items:center;gap:4px;">
+          UTM Zone:
+          <input type="number" id="utm-zone" value="21" min="1" max="60" style="width:42px;padding:4px;border:1px solid #ddd;border-radius:4px;font-size:12px;">
+        </label>
+        <label style="font-size:11px;color:#666;display:flex;align-items:center;gap:4px;">
+          <input type="checkbox" id="utm-north" checked> North
+        </label>
+      </div>
+      <button onclick="importUTM()" style="width:100%;margin-top:6px;padding:7px;background:#1a1a2e;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;">Import & Plot</button>
+      <button onclick="clearDrillHoles()" style="width:100%;margin-top:4px;padding:5px;background:transparent;color:#888;border:1px solid #ddd;border-radius:6px;font-size:11px;cursor:pointer;">Clear Drill Holes</button>
+      <div id="utm-status" style="text-align:center;font-size:11px;color:#888;margin-top:6px;"></div>
+    </div>
   </div>
 
   <div class="loading-overlay" id="loading">Loading tiles...</div>
+  <div class="basemap-toast" id="basemap-toast"><span class="spinner"></span><span id="basemap-toast-text">Loading satellite imagery...</span></div>
 
   <div class="info-badge">
     Powered by minesTech
@@ -239,15 +547,247 @@
   <script>
     // Config
     const MAPBIOMAS_API = 'https://prd.plataforma.mapbiomas.org/api/v1/pan-amazonia/maps/map/';
-    // Auto-detect: use relative path on Vercel, localhost for dev
+    // Auto-detect: use relative path on Vercel, probe common localhost ports in dev.
     const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const GEE_API = IS_LOCAL ? 'http://localhost:5001/api' : '/api';
     const SURINAME_CENTER = [-55.9, 4.0];
     const SURINAME_ZOOM = 7;
 
     let currentDetectionYear = 2024;
     let map;
     let debounceTimer;
+    let inspectMode = false;
+    window._currentPlotCoords = null;
+    window._savedPlots = [];
+    window._savedPlotMarkers = [];
+    let _usePlotsServerAPI = true;
+
+    const INSPECT_RULE_LABELS = {
+      ndvi_rule: 'NDVI',
+      bsi_rule: 'BSI',
+      swir_rule: 'SWIR',
+      base_detection: 'Base',
+      land_context: 'Land',
+      ndwi_rule: 'NDWI',
+      mndwi_rule: 'MNDWI',
+      nir_gt_green_rule: 'NIR>G',
+      near_water_excavation: 'Water Override',
+      water_mask: 'Water',
+      water_buffered: 'Water Buffer',
+      coastal_flat: 'Coastal',
+      detected: 'Detected'
+    };
+
+    function getDetectionUrls(year) {
+      if (!IS_LOCAL) return [`/api/detect?year=${year}`];
+
+      const candidates = [];
+      if (window.location.origin && window.location.origin !== 'null') {
+        candidates.push(`${window.location.origin}/api/detect/${year}`);
+      }
+
+      candidates.push(
+        `http://localhost:5000/api/detect/${year}`,
+        `http://127.0.0.1:5000/api/detect/${year}`,
+        `http://localhost:5001/api/detect/${year}`,
+        `http://127.0.0.1:5001/api/detect/${year}`
+      );
+
+      return [...new Set(candidates)];
+    }
+
+    async function fetchDetection(year) {
+      const urls = getDetectionUrls(year);
+      let lastError = null;
+
+      for (const url of urls) {
+        try {
+          const resp = await fetch(url);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+          const data = await resp.json();
+          if (data.error) throw new Error(data.error);
+          return data;
+        } catch (err) {
+          lastError = err;
+        }
+      }
+
+      throw lastError || new Error('Detection service unavailable');
+    }
+
+    function getInspectUrls(year, lat, lon) {
+      const query = `lat=${lat}&lon=${lon}`;
+      if (!IS_LOCAL) return [`/api/inspect?year=${year}&${query}`];
+
+      const candidates = [];
+      if (window.location.origin && window.location.origin !== 'null') {
+        candidates.push(`${window.location.origin}/api/inspect/${year}?${query}`);
+      }
+
+      candidates.push(
+        `http://localhost:5000/api/inspect/${year}?${query}`,
+        `http://127.0.0.1:5000/api/inspect/${year}?${query}`,
+        `http://localhost:5001/api/inspect/${year}?${query}`,
+        `http://127.0.0.1:5001/api/inspect/${year}?${query}`
+      );
+
+      return [...new Set(candidates)];
+    }
+
+    async function fetchInspection(year, lat, lon) {
+      const urls = getInspectUrls(year, lat, lon);
+      let lastError = null;
+
+      for (const url of urls) {
+        try {
+          const resp = await fetch(url);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const data = await resp.json();
+          if (data.error) throw new Error(data.error);
+          return data;
+        } catch (err) {
+          lastError = err;
+        }
+      }
+
+      throw lastError || new Error('Inspection service unavailable');
+    }
+
+    function getPlotsApiUrls() {
+      if (!IS_LOCAL) return ['/api/plots'];
+      const candidates = [];
+      if (window.location.origin && window.location.origin !== 'null') {
+        candidates.push(`${window.location.origin}/api/plots`);
+      }
+      candidates.push('http://localhost:5000/api/plots', 'http://localhost:5001/api/plots');
+      return [...new Set(candidates)];
+    }
+
+    async function plotsApiRequest(method, body, idParam) {
+      const urls = getPlotsApiUrls();
+      for (const base of urls) {
+        try {
+          const url = idParam ? `${base}/${idParam}` : base;
+          const opts = { method, headers: { 'Content-Type': 'application/json' } };
+          if (body) opts.body = JSON.stringify(body);
+          const resp = await fetch(url, opts);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          return await resp.json();
+        } catch (e) { /* try next */ }
+      }
+      if (method === 'DELETE' && idParam) {
+        for (const base of urls) {
+          try {
+            const resp = await fetch(`${base}?id=${idParam}`, { method: 'DELETE' });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            return await resp.json();
+          } catch (e) { /* try next */ }
+        }
+      }
+      _usePlotsServerAPI = false;
+      return null;
+    }
+
+    const SAVED_PLOTS_KEY = 'minestech_saved_plots';
+    function getLocalPlots() {
+      try { return JSON.parse(localStorage.getItem(SAVED_PLOTS_KEY)) || []; } catch { return []; }
+    }
+    function writeLocalPlots(plots) {
+      localStorage.setItem(SAVED_PLOTS_KEY, JSON.stringify(plots));
+    }
+
+    function formatMetric(value, digits = 3) {
+      if (value === null || value === undefined) return 'n/a';
+      if (typeof value !== 'number') return String(value);
+      if (Math.abs(value) >= 1000) return Math.round(value).toString();
+      return value.toFixed(digits);
+    }
+
+    function rulePill(label, passed) {
+      return `<span class="rule-pill ${passed ? 'rule-pass' : 'rule-fail'}">${label}: ${passed ? 'pass' : 'fail'}</span>`;
+    }
+
+    function buildInspectionPopup(data) {
+      const metrics = data.metrics || {};
+      const rules = data.rules || {};
+      const orderedRules = [
+        'ndvi_rule', 'bsi_rule', 'swir_rule', 'base_detection',
+        'land_context', 'ndwi_rule', 'mndwi_rule', 'nir_gt_green_rule',
+        'near_water_excavation', 'water_mask', 'water_buffered',
+        'coastal_flat', 'detected'
+      ];
+
+      const ruleHtml = orderedRules
+        .filter(key => key in rules)
+        .map(key => rulePill(INSPECT_RULE_LABELS[key] || key, !!rules[key]))
+        .join('');
+
+      const blockers = (data.blockers && data.blockers.length)
+        ? `<div style="margin-top:8px;color:#9d2525;"><b>Blockers:</b> ${data.blockers.join(', ')}</div>`
+        : '';
+
+      return `
+        <div class="inspect-popup">
+          <h4>${data.detected ? 'Detected' : 'Not Detected'} · ${data.year}</h4>
+          <div class="summary">${data.summary}</div>
+          <div style="margin-bottom:8px;color:#666;">
+            <b>Point:</b> ${formatMetric(data.lat, 5)}, ${formatMetric(data.lon, 5)}
+          </div>
+          <div class="metrics">
+            <div class="metric"><b>NDVI</b> ${formatMetric(metrics.ndvi)}</div>
+            <div class="metric"><b>BSI</b> ${formatMetric(metrics.bsi)}</div>
+            <div class="metric"><b>NDWI</b> ${formatMetric(metrics.ndwi)}</div>
+            <div class="metric"><b>MNDWI</b> ${formatMetric(metrics.mndwi)}</div>
+            <div class="metric"><b>B11</b> ${formatMetric(metrics.B11, 0)}</div>
+            <div class="metric"><b>SCL</b> ${formatMetric(metrics.SCL, 0)}</div>
+            <div class="metric"><b>Elev</b> ${formatMetric(metrics.elevation_m, 0)} m</div>
+            <div class="metric"><b>Water Occ.</b> ${formatMetric(metrics.water_occurrence, 0)}</div>
+          </div>
+          <div class="rule-list">${ruleHtml}</div>
+          ${blockers}
+        </div>
+      `;
+    }
+
+    function toggleInspectMode() {
+      inspectMode = document.getElementById('toggle-inspect').checked;
+      const status = document.getElementById('inspect-status');
+      status.style.color = '#777';
+
+      if (inspectMode) {
+        status.textContent = 'Point Inspect active. Click the map to see why that pixel was hit or missed.';
+        map.getCanvas().style.cursor = 'crosshair';
+      } else {
+        status.textContent = 'Off. Enable Point Inspect, then click the map.';
+        map.getCanvas().style.cursor = '';
+        if (window._inspectPopup) {
+          window._inspectPopup.remove();
+          window._inspectPopup = null;
+        }
+      }
+    }
+
+    async function inspectPoint(lat, lon) {
+      const status = document.getElementById('inspect-status');
+      status.textContent = `Inspecting ${lat.toFixed(5)}, ${lon.toFixed(5)} ...`;
+      status.style.color = '#777';
+
+      try {
+        const data = await fetchInspection(currentDetectionYear, lat.toFixed(5), lon.toFixed(5));
+        status.textContent = `${data.detected ? 'Detected' : 'Not detected'} at ${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+        status.style.color = data.detected ? '#146c2e' : '#9d2525';
+
+        if (window._inspectPopup) window._inspectPopup.remove();
+        window._inspectPopup = new maplibregl.Popup({ maxWidth: '320px', closeButton: true })
+          .setLngLat([lon, lat])
+          .setHTML(buildInspectionPopup(data))
+          .addTo(map);
+      } catch (err) {
+        console.error('Failed to inspect point:', err);
+        status.textContent = 'Point inspection failed. Check the local backend.';
+        status.style.color = '#af2a2a';
+      }
+    }
 
     // Initialize map
     map = new maplibregl.Map({
@@ -294,7 +834,10 @@
     map.on('load', () => {
       loadConfirmedMining();
       loadDetectedMining(currentDetectionYear);
+      loadAMWMining();
+      loadTimelineMining();
       loadSurinameBorder();
+      loadSavedPlots();
     });
 
     // ── Layer 1: Confirmed Mining (MapBiomas 2023, red, always on) ──
@@ -341,14 +884,7 @@
       status.textContent = 'Loading detection...';
 
       try {
-        // Works for both local (Flask) and Vercel (serverless)
-        const url = IS_LOCAL
-          ? `${GEE_API}/detect/${year}`
-          : `${GEE_API}/detect?year=${year}`;
-        const resp = await fetch(url);
-        const data = await resp.json();
-        if (data.error) throw new Error(data.error);
-
+        const data = await fetchDetection(year);
         applyDetectedLayer(data.url);
         status.textContent = `Detection loaded for ${year}`;
         loading.classList.remove('active');
@@ -382,13 +918,380 @@
       });
     }
 
+    // ── Layer 3: Amazon Mining Watch (per-period colored layers) ──
+
+    let amwMode = 'cumulative';
+    const AMW_ALL_PERIODS = [
+      '2018','2019','2020','2021','2022','2023','2024','2025Q2','2025Q3','2025Q4'
+    ];
+    const AMW_LABELS = {
+      '2018':'2018','2019':'2019','2020':'2020','2021':'2021',
+      '2022':'2022','2023':'2023','2024':'2024',
+      '2025Q2':'2025 Q1-Q2','2025Q3':'2025 Q3','2025Q4':'2025 Q4'
+    };
+    let amwPeriod = '2025Q4';
+    let amwPageStart = 7;  // show last 3 periods by default
+    const AMW_PAGE_SIZE = 3;
+
+    // Color: position-based within visible window — oldest=light yellow, newest=red
+    function amwColorForIndex(i, total) {
+      if (total <= 1) return { fill: '#EF5350', outline: '#C62828' };
+      const t = i / (total - 1); // 0..1
+      if (t < 0.5) {
+        // light yellow → yellow
+        const r = Math.round(255);
+        const g = Math.round(249 - (249-213)*t*2);
+        const b = Math.round(196 - (196-79)*t*2);
+        return { fill: `rgb(${r},${g},${b})`, outline: `rgb(${Math.round(r*0.7)},${Math.round(g*0.6)},0)` };
+      } else {
+        // yellow → red
+        const t2 = (t-0.5)*2;
+        const r = Math.round(255 - (255-239)*t2);
+        const g = Math.round(213 - (213-83)*t2);
+        const b = Math.round(79 - (79-80)*t2);
+        return { fill: `rgb(${r},${g},${b})`, outline: `rgb(${Math.round(r*0.7)},${Math.round(g*0.4)},${Math.round(b*0.3)})` };
+      }
+    }
+
+    const amwDataCache = {};
+    const amwLayersCreated = new Set();
+
+    function amwApiUrls(path) {
+      if (!IS_LOCAL) return ['/api/' + path];
+      const urls = [];
+      if (window.location.origin && window.location.origin !== 'null')
+        urls.push(`${window.location.origin}/api/${path}`);
+      urls.push('http://localhost:5000/api/' + path, 'http://localhost:5001/api/' + path);
+      return [...new Set(urls)];
+    }
+
+    async function fetchAMW(path) {
+      for (const url of amwApiUrls(path)) {
+        try {
+          const r = await fetch(url);
+          if (!r.ok) throw new Error(`HTTP ${r.status}`);
+          return await r.json();
+        } catch (e) { /* try next */ }
+      }
+      return null;
+    }
+
+    async function ensureAMWPeriodLoaded(period) {
+      if (amwDataCache[period]) return amwDataCache[period];
+      const data = await fetchAMW(`amw/period/${period}`);
+      if (data && data.features) {
+        amwDataCache[period] = data;
+        return data;
+      }
+      return null;
+    }
+
+    function amwLayerIds(period) {
+      return { fill: `amw-${period}-fill`, outline: `amw-${period}-outline` };
+    }
+
+    function ensureAMWLayer(period, data) {
+      const srcId = `amw-${period}`;
+      const ids = amwLayerIds(period);
+      if (amwLayersCreated.has(period)) return;
+
+      map.addSource(srcId, { type: 'geojson', data });
+      map.addLayer({
+        id: ids.fill, type: 'fill', source: srcId,
+        layout: { visibility: 'none' },
+        paint: { 'fill-color': '#FFD54F', 'fill-opacity': 0.4 }
+      });
+      map.addLayer({
+        id: ids.outline, type: 'line', source: srcId,
+        layout: { visibility: 'none' },
+        paint: { 'line-color': '#F57F17', 'line-width': 0.8 }
+      });
+
+      map.on('click', ids.fill, (e) => {
+        if (inspectMode || rulerMode) return;
+        const modeLabel = amwMode === 'cumulative' ? 'Cumulative' : 'Single period';
+        new maplibregl.Popup({ maxWidth: '240px' })
+          .setLngLat(e.lngLat)
+          .setHTML(`<div style="font-size:12px;"><b style="color:#1565C0;">Amazon Mining Watch</b><br>${modeLabel} · ${AMW_LABELS[period]}<br>Model: ${parseInt(period) <= 2023 ? 'CNN ensemble v3' : 'SSL4EO ViT-DINO + MLP'}<br><span style="color:#888;">Source: earthrise-media</span></div>`)
+          .addTo(map);
+      });
+      map.on('mouseenter', ids.fill, () => {
+        if (!inspectMode && !rulerMode) map.getCanvas().style.cursor = 'pointer';
+      });
+      map.on('mouseleave', ids.fill, () => {
+        if (!inspectMode && !rulerMode) map.getCanvas().style.cursor = '';
+      });
+
+      amwLayersCreated.add(period);
+    }
+
+    // Render period buttons for current page
+    function renderAMWPeriodButtons() {
+      const container = document.getElementById('amw-period-btns');
+      const visible = AMW_ALL_PERIODS.slice(amwPageStart, amwPageStart + AMW_PAGE_SIZE);
+      container.innerHTML = visible.map(p =>
+        `<button class="amw-period-btn${p === amwPeriod ? ' active' : ''}" data-period="${p}" onclick="setAMWPeriod('${p}')">${AMW_LABELS[p]}</button>`
+      ).join('');
+    }
+
+    function amwPeriodNav(dir) {
+      const newStart = amwPageStart + dir * AMW_PAGE_SIZE;
+      if (newStart < 0 || newStart >= AMW_ALL_PERIODS.length) return;
+      amwPageStart = Math.max(0, Math.min(newStart, AMW_ALL_PERIODS.length - AMW_PAGE_SIZE));
+      renderAMWPeriodButtons();
+    }
+
+    async function loadAMWMining() {
+      const statusEl = document.getElementById('amw-period-status');
+      if (statusEl) statusEl.textContent = 'Loading...';
+
+      renderAMWPeriodButtons();
+
+      // Pre-load visible page periods
+      const visiblePeriods = AMW_ALL_PERIODS.slice(amwPageStart, amwPageStart + AMW_PAGE_SIZE);
+      const results = await Promise.all(visiblePeriods.map(p => ensureAMWPeriodLoaded(p)));
+
+      results.forEach((data, i) => {
+        if (data) ensureAMWLayer(visiblePeriods[i], data);
+      });
+
+      await updateAMWLayerVisibility();
+      console.log(`AMW: initialized with ${AMW_ALL_PERIODS.length} periods (2018–2025Q4)`);
+    }
+
+    function updateAMWStatus(count) {
+      const el = document.getElementById('amw-period-status');
+      if (el) el.textContent = count !== null ? `${count.toLocaleString()} detections` : '';
+    }
+
+    async function updateAMWLayerVisibility() {
+      const amwOn = document.getElementById('toggle-amw').checked;
+      const pidx = AMW_ALL_PERIODS.indexOf(amwPeriod);
+      let totalFeatures = 0;
+
+      // Determine which periods should be visible
+      const activePeriods = [];
+      AMW_ALL_PERIODS.forEach((period, i) => {
+        let show = false;
+        if (amwMode === 'cumulative') {
+          show = i <= pidx;
+        } else {
+          show = period === amwPeriod;
+        }
+        if (show) activePeriods.push(period);
+      });
+
+      // Ensure all active periods are loaded
+      const toLoad = activePeriods.filter(p => !amwDataCache[p]);
+      if (toLoad.length > 0) {
+        updateAMWStatus(null);
+        document.getElementById('amw-period-status').textContent = 'Loading...';
+        const loaded = await Promise.all(toLoad.map(p => ensureAMWPeriodLoaded(p)));
+        loaded.forEach((data, i) => {
+          if (data) ensureAMWLayer(toLoad[i], data);
+        });
+      }
+
+      // Compute colors: in cumulative, gradient across all active periods
+      const colorTotal = activePeriods.length;
+
+      // Update all layer visibility and colors
+      AMW_ALL_PERIODS.forEach((period, i) => {
+        const ids = amwLayerIds(period);
+        if (!amwLayersCreated.has(period)) return;
+
+        const isActive = activePeriods.includes(period);
+        const v = (amwOn && isActive) ? 'visible' : 'none';
+        map.setLayoutProperty(ids.fill, 'visibility', v);
+        map.setLayoutProperty(ids.outline, 'visibility', v);
+
+        if (isActive) {
+          const activeIdx = activePeriods.indexOf(period);
+          const colors = amwColorForIndex(activeIdx, colorTotal);
+          const opacity = parseInt(document.getElementById('opacity-amw').value) / 100;
+          map.setPaintProperty(ids.fill, 'fill-color', colors.fill);
+          map.setPaintProperty(ids.fill, 'fill-opacity', opacity * 0.6);
+          map.setPaintProperty(ids.outline, 'line-color', colors.outline);
+          map.setPaintProperty(ids.outline, 'line-opacity', opacity);
+
+          if (amwDataCache[period]) totalFeatures += amwDataCache[period].features.length;
+        }
+      });
+
+      updateAMWStatus(totalFeatures);
+
+      // Sync the detection year slider if the AMW period maps to a year
+      const yearMatch = amwPeriod.match(/^(\d{4})/);
+      if (yearMatch) {
+        const yr = parseInt(yearMatch[1]);
+        const slider = document.getElementById('year-slider');
+        const minYr = parseInt(slider.min), maxYr = parseInt(slider.max);
+        if (yr >= minYr && yr <= maxYr && parseInt(slider.value) !== yr) {
+          slider.value = yr;
+          onYearChange(yr, true);
+        }
+      }
+    }
+
+    function setAMWMode(mode) {
+      amwMode = mode;
+      document.getElementById('amw-mode-cum').classList.toggle('active', mode === 'cumulative');
+      document.getElementById('amw-mode-single').classList.toggle('active', mode === 'single');
+      const tag = document.getElementById('amw-legend-tag');
+      if (tag) tag.textContent = mode === 'cumulative' ? 'AMW Cum.' : 'AMW Single';
+      updateAMWLayerVisibility();
+    }
+
+    function setAMWPeriod(period) {
+      amwPeriod = period;
+      // Ensure selected period is on a visible page
+      const idx = AMW_ALL_PERIODS.indexOf(period);
+      if (idx < amwPageStart || idx >= amwPageStart + AMW_PAGE_SIZE) {
+        amwPageStart = Math.max(0, Math.min(idx, AMW_ALL_PERIODS.length - AMW_PAGE_SIZE));
+      }
+      renderAMWPeriodButtons();
+      updateAMWLayerVisibility();
+    }
+
+    function toggleAMW() {
+      updateAMWLayerVisibility();
+    }
+
+    function setAMWOpacity(val) {
+      document.getElementById('opacity-amw-val').textContent = val + '%';
+      const opacity = parseInt(val) / 100;
+      AMW_ALL_PERIODS.forEach(period => {
+        const ids = amwLayerIds(period);
+        if (amwLayersCreated.has(period)) {
+          map.setPaintProperty(ids.fill, 'fill-opacity', opacity * 0.6);
+          map.setPaintProperty(ids.outline, 'line-opacity', opacity);
+        }
+      });
+    }
+
+    // ── Layer 4: Mining Timeline (yearly, color gradient by age) ──
+
+    const TIMELINE_COLORS = {
+      2018: '#1a237e',  // darkest — oldest
+      2019: '#4a148c',
+      2020: '#880e4f',
+      2021: '#bf360c',
+      2022: '#e65100',
+      2023: '#f44336'   // brightest — most recent
+    };
+
+    async function loadTimelineMining() {
+      const urls = IS_LOCAL
+        ? [`${window.location.origin}/api/amw/yearly`, 'http://localhost:5001/api/amw/yearly']
+        : ['/api/amw/yearly'];
+
+      let data = null;
+      for (const url of [...new Set(urls)]) {
+        try {
+          const resp = await fetch(url);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          data = await resp.json();
+          break;
+        } catch (e) { /* try next */ }
+      }
+      if (!data || !data.features) {
+        console.error('Failed to load timeline data');
+        return;
+      }
+
+      map.addSource('timeline-mining', { type: 'geojson', data });
+
+      const opacity = parseInt(document.getElementById('opacity-timeline').value) / 100;
+
+      // One fill layer with data-driven color by year
+      map.addLayer({
+        id: 'timeline-mining-fill',
+        type: 'fill',
+        source: 'timeline-mining',
+        layout: { 'visibility': 'none' },  // off by default
+        paint: {
+          'fill-color': [
+            'match', ['get', 'year'],
+            2018, '#1a237e',
+            2019, '#4a148c',
+            2020, '#880e4f',
+            2021, '#bf360c',
+            2022, '#e65100',
+            2023, '#f44336',
+            '#888888'
+          ],
+          'fill-opacity': opacity * 0.7
+        }
+      });
+
+      map.addLayer({
+        id: 'timeline-mining-outline',
+        type: 'line',
+        source: 'timeline-mining',
+        layout: { 'visibility': 'none' },
+        paint: {
+          'line-color': [
+            'match', ['get', 'year'],
+            2018, '#0d1247',
+            2019, '#2a0845',
+            2020, '#560027',
+            2021, '#7a1f04',
+            2022, '#9e3a00',
+            2023, '#c62828',
+            '#666666'
+          ],
+          'line-width': 0.5
+        }
+      });
+
+      // Click popup
+      map.on('click', 'timeline-mining-fill', (e) => {
+        if (inspectMode || rulerMode) return;
+        const year = e.features[0].properties.year;
+        const color = TIMELINE_COLORS[year] || '#888';
+        new maplibregl.Popup({ maxWidth: '200px' })
+          .setLngLat(e.lngLat)
+          .setHTML(`<div style="font-size:12px;"><b style="color:${color};">Mining detected: ${year}</b><br>Source: Amazon Mining Watch<br>Model: CNN ensemble v3.2-3.7</div>`)
+          .addTo(map);
+      });
+
+      console.log(`Timeline: loaded ${data.features.length} features (2018-2023)`);
+    }
+
+    function toggleTimeline() {
+      const visible = document.getElementById('toggle-timeline').checked;
+      const v = visible ? 'visible' : 'none';
+      if (map.getLayer('timeline-mining-fill')) map.setLayoutProperty('timeline-mining-fill', 'visibility', v);
+      if (map.getLayer('timeline-mining-outline')) map.setLayoutProperty('timeline-mining-outline', 'visibility', v);
+    }
+
+    function setTimelineOpacity(val) {
+      document.getElementById('opacity-timeline-val').textContent = val + '%';
+      const opacity = parseInt(val) / 100;
+      if (map.getLayer('timeline-mining-fill')) map.setPaintProperty('timeline-mining-fill', 'fill-opacity', opacity * 0.7);
+      if (map.getLayer('timeline-mining-outline')) map.setPaintProperty('timeline-mining-outline', 'line-opacity', opacity);
+    }
+
     // ── Suriname Border ──
 
     async function loadSurinameBorder() {
-      try {
-        const resp = await fetch('https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_SUR_0.json');
-        const geojson = await resp.json();
+      // Try local API first, then fallback to external
+      const urls = IS_LOCAL
+        ? [`${window.location.origin}/api/border`, 'http://localhost:5001/api/border', 'https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_SUR_0.json']
+        : ['/api/border', 'https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_SUR_0.json'];
 
+      let geojson = null;
+      for (const url of urls) {
+        try {
+          const resp = await fetch(url);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          geojson = await resp.json();
+          break;
+        } catch (e) { /* try next */ }
+      }
+      if (!geojson) { console.error('Failed to load Suriname border'); return; }
+
+      try {
         map.addSource('suriname-border', { type: 'geojson', data: geojson });
 
         map.addLayer({
@@ -419,13 +1322,107 @@
           }
         });
       } catch (err) {
-        console.error('Failed to load Suriname border:', err);
+        console.error('Failed to render Suriname border:', err);
+      }
+    }
+
+    // ── Historical Sentinel-2 Basemap ──
+
+    const basemapCache = {};  // year → tile URL
+    let basemapYear = null;
+
+    function showBasemapToast(msg) {
+      const toast = document.getElementById('basemap-toast');
+      const text = document.getElementById('basemap-toast-text');
+      if (text) text.textContent = msg;
+      if (toast) toast.classList.add('show');
+    }
+    function hideBasemapToast() {
+      const toast = document.getElementById('basemap-toast');
+      if (toast) toast.classList.remove('show');
+    }
+
+    async function loadHistoricalBasemap(year) {
+      const toggle = document.getElementById('toggle-historical-basemap');
+      if (!toggle || !toggle.checked) return;
+
+      year = parseInt(year);
+      if (year === basemapYear) return;
+
+      const status = document.getElementById('basemap-status');
+
+      // Check cache — instant, no toast needed
+      if (basemapCache[year]) {
+        applyBasemapTiles(basemapCache[year], year);
+        if (status) status.textContent = `Sentinel-2 ${year}`;
+        return;
+      }
+
+      // Show toast for GEE loading
+      showBasemapToast(`Loading ${year} satellite imagery...`);
+      if (status) status.textContent = `Loading...`;
+
+      const urls = IS_LOCAL
+        ? [`${window.location.origin}/api/basemap/${year}`, `http://localhost:5001/api/basemap/${year}`]
+        : [`/api/basemap/${year}`];
+
+      for (const url of urls) {
+        try {
+          const resp = await fetch(url);
+          if (!resp.ok) continue;
+          const data = await resp.json();
+          if (data.url) {
+            basemapCache[year] = data.url;
+            applyBasemapTiles(data.url, year);
+            if (status) status.textContent = `Sentinel-2 ${year}`;
+            hideBasemapToast();
+            return;
+          }
+        } catch (e) { /* try next */ }
+      }
+      if (status) status.textContent = 'Unavailable';
+      hideBasemapToast();
+    }
+
+    function applyBasemapTiles(tileUrl, year) {
+      // Remove old historical basemap layer/source
+      if (map.getLayer('historical-basemap-layer')) map.removeLayer('historical-basemap-layer');
+      if (map.getSource('historical-basemap')) map.removeSource('historical-basemap');
+
+      map.addSource('historical-basemap', {
+        type: 'raster',
+        tiles: [tileUrl],
+        tileSize: 256
+      });
+
+      // Insert just above the static satellite layer (below all other layers)
+      const firstLayerId = map.getStyle().layers[1]?.id || undefined;
+      map.addLayer({
+        id: 'historical-basemap-layer',
+        type: 'raster',
+        source: 'historical-basemap',
+        paint: { 'raster-opacity': 1.0 }
+      }, firstLayerId);
+
+      basemapYear = year;
+    }
+
+    function toggleHistoricalBasemap() {
+      const on = document.getElementById('toggle-historical-basemap').checked;
+      const status = document.getElementById('basemap-status');
+      if (on) {
+        loadHistoricalBasemap(currentDetectionYear);
+      } else {
+        if (map.getLayer('historical-basemap-layer')) map.removeLayer('historical-basemap-layer');
+        if (map.getSource('historical-basemap')) map.removeSource('historical-basemap');
+        basemapYear = null;
+        if (status) status.textContent = '';
       }
     }
 
     // ── Controls ──
 
-    function onYearChange(year) {
+    function onYearChange(year, fromAMW) {
       document.getElementById('year-display').textContent = year;
       currentDetectionYear = parseInt(year);
       document.getElementById('detection-status').style.color = '#888';
@@ -433,7 +1430,24 @@
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
         loadDetectedMining(currentDetectionYear);
+        loadHistoricalBasemap(currentDetectionYear);
       }, 300);
+
+      // Sync AMW period when user drags the year slider (not when AMW triggered it)
+      if (!fromAMW) {
+        const yr = parseInt(year);
+        const match = AMW_ALL_PERIODS.find(p => p === String(yr)) ||
+                      AMW_ALL_PERIODS.find(p => p.startsWith(String(yr)));
+        if (match && match !== amwPeriod) {
+          amwPeriod = match;
+          const idx = AMW_ALL_PERIODS.indexOf(match);
+          if (idx < amwPageStart || idx >= amwPageStart + AMW_PAGE_SIZE) {
+            amwPageStart = Math.max(0, Math.min(idx, AMW_ALL_PERIODS.length - AMW_PAGE_SIZE));
+          }
+          renderAMWPeriodButtons();
+          updateAMWLayerVisibility();
+        }
+      }
     }
 
     function toggleConfirmed() {
@@ -529,28 +1543,826 @@
 
       map.flyTo({ center: [lon, lat], zoom: 13, duration: 2000 });
 
-      // Drop a marker
-      if (window._coordMarker) window._coordMarker.remove();
-      window._coordMarker = new maplibregl.Marker({ color: '#e6a817' })
-        .setLngLat([lon, lat])
-        .setPopup(new maplibregl.Popup().setHTML(`<b>${lat.toFixed(5)}, ${lon.toFixed(5)}</b>`))
-        .addTo(map);
-      window._coordMarker.togglePopup();
-
       display.textContent = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
       display.style.color = '#888';
+
+      // Auto-save (skip if same coordinates already saved)
+      const exists = window._savedLocations.some(
+        l => Math.abs(l.lat - lat) < 0.00001 && Math.abs(l.lon - lon) < 0.00001
+      );
+      if (!exists) {
+        autoSaveCoord(lat, lon);
+      }
+
+      if (inspectMode) inspectPoint(lat, lon);
     }
 
     // Enter key triggers Go
     document.getElementById('coord-lat').addEventListener('keydown', e => { if (e.key === 'Enter') goToCoords(); });
     document.getElementById('coord-lon').addEventListener('keydown', e => { if (e.key === 'Enter') goToCoords(); });
 
-    // Click on map shows coordinates
+    // ── DMS Import ──
+    function parseDMSLine(str) {
+      // Robust DMS parser for pasted field notes with noisy labels and mixed quote marks.
+      const cleaned = str
+        .replace(/[“”]/g, '"')
+        .replace(/[‘’]/g, "'")
+        .replace(/º/g, '°')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+      const m = cleaned.match(/(-?\d+(?:\.\d+)?)\s*[°]\s*(\d+(?:\.\d+)?)\s*['′]?\s*(\d+(?:\.\d+)?)\s*(?:["″']+)?/);
+      if (!m) return null;
+
+      const degrees = parseFloat(m[1]);
+      const minutes = parseFloat(m[2]);
+      const seconds = parseFloat(m[3]);
+      let value = Math.abs(degrees) + minutes / 60 + seconds / 3600;
+
+      const lower = cleaned.toLowerCase();
+      const hasWest = /\b(w|wl|w\.l\.?|west|westerlengte)\b/.test(lower);
+      const hasEast = /\b(e|east|oost)\b/.test(lower);
+      const hasNorth = /\b(n|n\.b\.?|north|noorderbreedte)\b/.test(lower);
+      const hasSouth = /\b(s|south|zuid)\b/.test(lower);
+
+      let kind;
+      if (Math.abs(degrees) >= 15) {
+        kind = 'lon';
+      } else if (hasWest || hasEast) {
+        kind = 'lon';
+      } else if (hasNorth || hasSouth) {
+        kind = 'lat';
+      } else {
+        kind = 'lat';
+      }
+
+      if (kind === 'lon') {
+        if (hasEast) value = Math.abs(value);
+        else value = -value;
+      } else if (degrees < 0 || hasSouth) {
+        value = -value;
+      }
+
+      return { kind, value, raw: cleaned };
+    }
+
+    function importDMS() {
+      const raw = document.getElementById('dms-input').value.trim();
+      const status = document.getElementById('dms-status');
+
+      if (!raw) {
+        status.textContent = 'Please paste coordinates';
+        status.style.color = '#af2a2a';
+        return;
+      }
+
+      const lines = raw.split('\n').map(l => l.trim()).filter(l => l);
+      const lats = [];
+      const lons = [];
+
+      for (const line of lines) {
+        const parsed = parseDMSLine(line);
+        if (!parsed) continue;
+        if (parsed.kind === 'lat') lats.push(parsed.value);
+        else lons.push(parsed.value);
+      }
+
+      if (lats.length === 0 || lons.length === 0) {
+        status.textContent = 'Could not parse coordinates. Paste DMS values like 5° 9\' 41.42" and 55° 26\' 28.40" W.';
+        status.style.color = '#af2a2a';
+        return;
+      }
+
+      if (lats.length !== lons.length) {
+        status.textContent = `Mismatch: found ${lats.length} latitudes and ${lons.length} longitudes`;
+        status.style.color = '#af2a2a';
+        return;
+      }
+
+      // Build coordinate pairs [lon, lat]
+      const coords = lats.map((lat, i) => [lons[i], lat]);
+      // Close the polygon
+      coords.push(coords[0]);
+
+      // Remove previous plot
+      clearPlot();
+      window._currentPlotCoords = coords;
+
+      // Add polygon source + layers
+      map.addSource('dms-plot', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          geometry: { type: 'Polygon', coordinates: [coords] }
+        }
+      });
+
+      map.addLayer({
+        id: 'dms-plot-fill',
+        type: 'fill',
+        source: 'dms-plot',
+        paint: { 'fill-color': '#e6a817', 'fill-opacity': 0.2 }
+      });
+
+      map.addLayer({
+        id: 'dms-plot-border',
+        type: 'line',
+        source: 'dms-plot',
+        paint: { 'line-color': '#e6a817', 'line-width': 2.5 }
+      });
+
+      // Add point markers with labels
+      const labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      coords.slice(0, -1).forEach((c, i) => {
+        const el = document.createElement('div');
+        el.style.cssText = 'width:22px;height:22px;background:#e6a817;color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:12px;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);';
+        el.textContent = labels[i] || (i + 1);
+        const marker = new maplibregl.Marker({ element: el })
+          .setLngLat(c)
+          .setPopup(new maplibregl.Popup().setHTML(`<b>${labels[i]}</b><br>${c[1].toFixed(5)}°N, ${Math.abs(c[0]).toFixed(5)}°W`))
+          .addTo(map);
+        if (!window._dmsMarkers) window._dmsMarkers = [];
+        window._dmsMarkers.push(marker);
+      });
+
+      // Fly to bounds
+      const allLons = coords.map(c => c[0]);
+      const allLats = coords.map(c => c[1]);
+      map.fitBounds([
+        [Math.min(...allLons) - 0.005, Math.min(...allLats) - 0.005],
+        [Math.max(...allLons) + 0.005, Math.max(...allLats) + 0.005]
+      ], { padding: 40, duration: 2000 });
+
+      status.textContent = `Plotted ${lats.length} points`;
+      status.style.color = '#4CAF50';
+    }
+
+    function clearPlot() {
+      if (map.getLayer('dms-plot-fill')) map.removeLayer('dms-plot-fill');
+      if (map.getLayer('dms-plot-border')) map.removeLayer('dms-plot-border');
+      if (map.getSource('dms-plot')) map.removeSource('dms-plot');
+      if (window._dmsMarkers) {
+        window._dmsMarkers.forEach(m => m.remove());
+        window._dmsMarkers = [];
+      }
+      const status = document.getElementById('dms-status');
+      if (status) { status.textContent = ''; }
+      window._currentPlotCoords = null;
+    }
+
+    function polygonCentroid(coords) {
+      const points = coords.slice(0, -1);
+      const sum = points.reduce((acc, p) => {
+        acc.lon += p[0];
+        acc.lat += p[1];
+        return acc;
+      }, { lon: 0, lat: 0 });
+      return [sum.lon / points.length, sum.lat / points.length];
+    }
+
+    function removeSavedPlotLayers(id) {
+      const fillId = `saved-plot-fill-${id}`;
+      const lineId = `saved-plot-line-${id}`;
+      const srcId = `saved-plot-src-${id}`;
+      if (map.getLayer(fillId)) map.removeLayer(fillId);
+      if (map.getLayer(lineId)) map.removeLayer(lineId);
+      if (map.getSource(srcId)) map.removeSource(srcId);
+    }
+
+    async function loadSavedPlots() {
+      const serverData = await plotsApiRequest('GET');
+      if (serverData !== null) {
+        _usePlotsServerAPI = true;
+        window._savedPlots = serverData;
+      } else {
+        window._savedPlots = getLocalPlots();
+      }
+      renderSavedPlots();
+    }
+
+    async function saveCurrentPlot() {
+      const status = document.getElementById('dms-status');
+      if (!window._currentPlotCoords || window._currentPlotCoords.length < 4) {
+        status.textContent = 'Import and plot coordinates before saving.';
+        status.style.color = '#af2a2a';
+        return;
+      }
+
+      const nameInput = document.getElementById('dms-name');
+      const noteInput = document.getElementById('dms-note');
+      const name = (nameInput.value || '').trim() || `Area ${window._savedPlots.length + 1}`;
+      const note = (noteInput.value || '').trim();
+      const colors = ['#e6a817', '#ef5350', '#42a5f5', '#26a69a', '#ab47bc', '#ffa726'];
+      const color = colors[window._savedPlots.length % colors.length];
+      const plotData = { name, note, color, coords: window._currentPlotCoords };
+
+      if (_usePlotsServerAPI) {
+        const result = await plotsApiRequest('POST', plotData);
+        if (result && !result.error) {
+          window._savedPlots.push(result);
+        } else {
+          const plot = { ...plotData, id: Date.now(), savedAt: new Date().toISOString() };
+          window._savedPlots.push(plot);
+          writeLocalPlots(window._savedPlots);
+        }
+      } else {
+        const plot = { ...plotData, id: Date.now(), savedAt: new Date().toISOString() };
+        window._savedPlots.push(plot);
+        writeLocalPlots(window._savedPlots);
+      }
+
+      renderSavedPlots();
+      status.textContent = `Saved area: ${name}`;
+      status.style.color = '#4CAF50';
+      nameInput.value = '';
+      noteInput.value = '';
+    }
+
+    function renderSavedPlots() {
+      const list = document.getElementById('saved-plots-list');
+      window._savedPlotMarkers.forEach(m => m.remove());
+      window._savedPlotMarkers = [];
+
+      if (!window._savedPlots.length) {
+        list.innerHTML = '<div class="saved-empty">No saved areas yet</div>';
+        return;
+      }
+
+      list.innerHTML = window._savedPlots.map((plot, i) => `
+        <div class="saved-plot-item">
+          <div class="saved-plot-color" style="background:${plot.color || '#e6a817'}"></div>
+          <span class="saved-plot-name" onclick="flyToSavedPlot(${i})">${plot.name}</span>
+          <button class="saved-plot-btn" onclick="editSavedPlot(${i})">✎</button>
+          <button class="saved-plot-btn" onclick="deleteSavedPlot(${i})">×</button>
+        </div>
+        ${plot.note ? `<div class="saved-plot-note">${plot.note}</div>` : ''}
+      `).join('');
+
+      window._savedPlots.forEach((plot) => {
+        const srcId = `saved-plot-src-${plot.id}`;
+        const fillId = `saved-plot-fill-${plot.id}`;
+        const lineId = `saved-plot-line-${plot.id}`;
+        const color = plot.color || '#e6a817';
+        const feature = {
+          type: 'Feature',
+          properties: { id: plot.id, name: plot.name, note: plot.note || '' },
+          geometry: { type: 'Polygon', coordinates: [plot.coords] }
+        };
+
+        removeSavedPlotLayers(plot.id);
+        map.addSource(srcId, { type: 'geojson', data: feature });
+        map.addLayer({
+          id: fillId,
+          type: 'fill',
+          source: srcId,
+          paint: { 'fill-color': color, 'fill-opacity': 0.14 }
+        });
+        map.addLayer({
+          id: lineId,
+          type: 'line',
+          source: srcId,
+          paint: { 'line-color': color, 'line-width': 2.2 }
+        });
+
+        const center = polygonCentroid(plot.coords);
+        const markerEl = document.createElement('div');
+        markerEl.style.cssText = `padding:2px 6px;background:${color};color:#111;border:2px solid #fff;border-radius:999px;font-size:11px;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,.25);`;
+        markerEl.textContent = plot.name;
+        const popup = new maplibregl.Popup({ maxWidth: '260px' })
+          .setHTML(`<div style="font-size:12px;"><b>${plot.name}</b>${plot.note ? `<br><span style="color:#666;">${plot.note}</span>` : ''}</div>`);
+        const marker = new maplibregl.Marker({ element: markerEl })
+          .setLngLat(center)
+          .setPopup(popup)
+          .addTo(map);
+        window._savedPlotMarkers.push(marker);
+      });
+    }
+
+    function flyToSavedPlot(index) {
+      const plot = window._savedPlots[index];
+      if (!plot) return;
+      const lons = plot.coords.map(c => c[0]);
+      const lats = plot.coords.map(c => c[1]);
+      map.fitBounds([
+        [Math.min(...lons) - 0.003, Math.min(...lats) - 0.003],
+        [Math.max(...lons) + 0.003, Math.max(...lats) + 0.003]
+      ], { padding: 50, duration: 1500 });
+    }
+
+    async function editSavedPlot(index) {
+      const plot = window._savedPlots[index];
+      if (!plot) return;
+      const name = prompt('Area name:', plot.name);
+      if (name === null) return;
+      const note = prompt('Note:', plot.note || '');
+      if (note === null) return;
+      plot.name = name || plot.name;
+      plot.note = note || '';
+
+      if (_usePlotsServerAPI) await plotsApiRequest('PATCH', { name: plot.name, note: plot.note }, plot.id);
+      else writeLocalPlots(window._savedPlots);
+      renderSavedPlots();
+    }
+
+    async function deleteSavedPlot(index) {
+      const plot = window._savedPlots[index];
+      if (!plot) return;
+      if (_usePlotsServerAPI) await plotsApiRequest('DELETE', null, plot.id);
+      else {
+        window._savedPlots.splice(index, 1);
+        writeLocalPlots(window._savedPlots);
+        removeSavedPlotLayers(plot.id);
+        renderSavedPlots();
+        return;
+      }
+      window._savedPlots = window._savedPlots.filter((_, i) => i !== index);
+      removeSavedPlotLayers(plot.id);
+      renderSavedPlots();
+    }
+
+    async function clearAllSavedPlots() {
+      if (!confirm('Clear all saved areas?')) return;
+      if (_usePlotsServerAPI) await plotsApiRequest('DELETE');
+      else writeLocalPlots([]);
+      window._savedPlots.forEach(plot => removeSavedPlotLayers(plot.id));
+      window._savedPlots = [];
+      renderSavedPlots();
+    }
+
+    function downloadSavedPlots() {
+      if (!window._savedPlots.length) { alert('No saved areas to download.'); return; }
+      const geojson = {
+        type: 'FeatureCollection',
+        features: window._savedPlots.map(plot => ({
+          type: 'Feature',
+          properties: {
+            id: plot.id,
+            name: plot.name,
+            note: plot.note || '',
+            color: plot.color || '#e6a817',
+            savedAt: plot.savedAt
+          },
+          geometry: { type: 'Polygon', coordinates: [plot.coords] }
+        }))
+      };
+      const blob = new Blob([JSON.stringify(geojson, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'saved_areas.geojson';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // ── UTM to Lat/Lon conversion ──
+    function utmToLatLon(easting, northing, zone, northern) {
+      const a = 6378137, f = 1 / 298.257223563;
+      const e2 = 2 * f - f * f, ep2 = e2 / (1 - e2);
+      const k0 = 0.9996;
+      const x = easting - 500000;
+      const y = northern ? northing : northing - 10000000;
+      const M = y / k0;
+      const mu = M / (a * (1 - e2 / 4 - 3 * e2 * e2 / 64 - 5 * e2 * e2 * e2 / 256));
+      const e1 = (1 - Math.sqrt(1 - e2)) / (1 + Math.sqrt(1 - e2));
+      const phi1 = mu + (3 * e1 / 2 - 27 * e1 * e1 * e1 / 32) * Math.sin(2 * mu)
+        + (21 * e1 * e1 / 16 - 55 * e1 * e1 * e1 * e1 / 32) * Math.sin(4 * mu)
+        + (151 * e1 * e1 * e1 / 96) * Math.sin(6 * mu);
+      const sp = Math.sin(phi1), cp = Math.cos(phi1), tp = Math.tan(phi1);
+      const C1 = ep2 * cp * cp, T1 = tp * tp;
+      const N1 = a / Math.sqrt(1 - e2 * sp * sp);
+      const R1 = a * (1 - e2) / Math.pow(1 - e2 * sp * sp, 1.5);
+      const D = x / (N1 * k0);
+      const lat = phi1 - (N1 * tp / R1) * (D * D / 2 - (5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * ep2) * D * D * D * D / 24
+        + (61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * ep2 - 3 * C1 * C1) * D * D * D * D * D * D / 720);
+      const lon0 = ((zone - 1) * 6 - 180 + 3) * Math.PI / 180;
+      const lon = lon0 + (D - (1 + 2 * T1 + C1) * D * D * D / 6
+        + (5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * ep2 + 24 * T1 * T1) * D * D * D * D * D / 120) / cp;
+      return { lat: lat * 180 / Math.PI, lon: lon * 180 / Math.PI };
+    }
+
+    function parseUTMLine(line) {
+      const cleaned = line.replace(/\s+/g, ' ').trim();
+      if (!cleaned) return null;
+      if (/hole\s*id|easting|northing|elevation|target|^id\b/i.test(cleaned)) return null;
+
+      const tokens = cleaned.split(/[\t, ]+/).map(t => t.trim()).filter(Boolean);
+      if (tokens.length < 3) return null;
+
+      const coordTokenIndexes = [];
+      for (let i = 0; i < tokens.length; i++) {
+        if (/^\d{5,7}(?:\.\d+)?$/.test(tokens[i])) coordTokenIndexes.push(i);
+      }
+      if (coordTokenIndexes.length < 2) return null;
+
+      const eastIdx = coordTokenIndexes[0];
+      const northIdx = coordTokenIndexes[1];
+      const easting = parseFloat(tokens[eastIdx]);
+      const northing = parseFloat(tokens[northIdx]);
+      if (isNaN(easting) || isNaN(northing)) return null;
+
+      const holeId = eastIdx > 0 ? tokens[0] : `Hole-${Math.round(easting)}-${Math.round(northing)}`;
+      const target = eastIdx > 1 ? tokens.slice(1, eastIdx).join(' ') : '';
+
+      const trailingNumbers = tokens
+        .slice(northIdx + 1)
+        .map(t => parseFloat(t))
+        .filter(v => !isNaN(v));
+
+      return {
+        holeId,
+        target,
+        easting,
+        northing,
+        elevation: trailingNumbers.length > 0 ? trailingNumbers[0] : null,
+        eoh: trailingNumbers.length > 1 ? trailingNumbers[1] : null
+      };
+    }
+
+    function importUTM() {
+      const raw = document.getElementById('utm-input').value.trim();
+      const status = document.getElementById('utm-status');
+      const zone = parseInt(document.getElementById('utm-zone').value) || 21;
+      const northern = document.getElementById('utm-north').checked;
+
+      if (!raw) { status.textContent = 'Please paste drill hole data'; status.style.color = '#af2a2a'; return; }
+
+      const lines = raw.split('\n').map(l => l.trim()).filter(l => l);
+      const holes = [];
+      const targetColors = {};
+      const colorPalette = ['#e74c3c', '#3498db', '#2ecc71', '#e67e22', '#9b59b6', '#1abc9c', '#f39c12', '#e84393'];
+      let colorIdx = 0;
+
+      for (const line of lines) {
+        const parsed = parseUTMLine(line);
+        if (!parsed) continue;
+
+        const { holeId, target, easting, northing, elevation, eoh } = parsed;
+
+        if (!targetColors[target]) {
+          targetColors[target] = colorPalette[colorIdx % colorPalette.length];
+          colorIdx++;
+        }
+
+        const ll = utmToLatLon(easting, northing, zone, northern);
+        holes.push({ holeId, target, easting, northing, elevation, eoh, lat: ll.lat, lon: ll.lon });
+      }
+
+      if (holes.length === 0) {
+        status.textContent = 'No valid drill holes found. Check format.';
+        status.style.color = '#af2a2a';
+        return;
+      }
+
+      clearDrillHoles();
+
+      // Plot markers
+      window._drillMarkers = [];
+      holes.forEach(h => {
+        const color = targetColors[h.target] || '#e74c3c';
+        const el = document.createElement('div');
+        el.style.cssText = `width:12px;height:12px;background:${color};border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.5);cursor:pointer;`;
+
+        let popupHtml = `<div style="font-size:12px;line-height:1.5;">
+          <b style="font-size:13px;">${h.holeId}</b><br>
+          <span style="display:inline-block;width:8px;height:8px;background:${color};border-radius:50;margin-right:4px;"></span>Target: <b>${h.target}</b><br>
+          UTM: ${h.easting}, ${h.northing}<br>
+          Lat/Lon: ${h.lat.toFixed(5)}°, ${h.lon.toFixed(5)}°`;
+        if (h.elevation !== null) popupHtml += `<br>Elevation: ${h.elevation} m`;
+        if (h.eoh !== null) popupHtml += `<br>EOH: ${h.eoh} m`;
+        popupHtml += '</div>';
+
+        const marker = new maplibregl.Marker({ element: el })
+          .setLngLat([h.lon, h.lat])
+          .setPopup(new maplibregl.Popup({ maxWidth: '220px' }).setHTML(popupHtml))
+          .addTo(map);
+        window._drillMarkers.push(marker);
+      });
+
+      // Fit bounds
+      const lons = holes.map(h => h.lon), lats = holes.map(h => h.lat);
+      map.fitBounds([
+        [Math.min(...lons) - 0.005, Math.min(...lats) - 0.005],
+        [Math.max(...lons) + 0.005, Math.max(...lats) + 0.005]
+      ], { padding: 40, duration: 2000 });
+
+      // Legend
+      const legend = Object.entries(targetColors).map(([t, c]) =>
+        `<span style="display:inline-block;width:8px;height:8px;background:${c};border-radius:50%;margin-right:3px;"></span>${t}`
+      ).join('&nbsp;&nbsp;');
+      status.innerHTML = `Plotted ${holes.length} holes<br><span style="font-size:10px;">${legend}</span>`;
+      status.style.color = '#4CAF50';
+    }
+
+    function clearDrillHoles() {
+      if (window._drillMarkers) {
+        window._drillMarkers.forEach(m => m.remove());
+        window._drillMarkers = [];
+      }
+      const status = document.getElementById('utm-status');
+      if (status) { status.textContent = ''; }
+    }
+
+    // ── Saved Locations (server API with localStorage fallback) ──
+
+    window._savedMarkers = [];
+    window._savedLocations = []; // in-memory cache
+    let _useServerAPI = true;
+
+    function getLocationsApiUrls() {
+      if (!IS_LOCAL) return ['/api/locations'];
+      const candidates = [];
+      if (window.location.origin && window.location.origin !== 'null') {
+        candidates.push(`${window.location.origin}/api/locations`);
+      }
+      candidates.push(
+        'http://localhost:5000/api/locations',
+        'http://localhost:5001/api/locations'
+      );
+      return [...new Set(candidates)];
+    }
+
+    // Try server API; on failure, fall back to localStorage
+    async function apiRequest(method, body, idParam) {
+      const urls = getLocationsApiUrls();
+      for (const base of urls) {
+        try {
+          const url = idParam ? `${base}/${idParam}` : base;
+          const opts = { method, headers: { 'Content-Type': 'application/json' } };
+          if (body) opts.body = JSON.stringify(body);
+          const resp = await fetch(url, opts);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          return await resp.json();
+        } catch (e) { /* try next */ }
+      }
+      // If all server URLs fail, also try DELETE with query param (Vercel style)
+      if (method === 'DELETE' && idParam) {
+        for (const base of urls) {
+          try {
+            const resp = await fetch(`${base}?id=${idParam}`, { method: 'DELETE' });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            return await resp.json();
+          } catch (e) { /* try next */ }
+        }
+      }
+      _useServerAPI = false;
+      return null;
+    }
+
+    // localStorage fallback
+    const SAVED_KEY = 'minestech_saved_locations';
+    function getLocalLocations() {
+      try { return JSON.parse(localStorage.getItem(SAVED_KEY)) || []; } catch { return []; }
+    }
+    function writeLocalLocations(locs) {
+      localStorage.setItem(SAVED_KEY, JSON.stringify(locs));
+    }
+
+    async function loadSavedLocations() {
+      const serverData = await apiRequest('GET');
+      if (serverData !== null) {
+        _useServerAPI = true;
+        window._savedLocations = serverData;
+      } else {
+        window._savedLocations = getLocalLocations();
+      }
+      renderSavedMarkers();
+    }
+
+    async function autoSaveCoord(lat, lon) {
+      const colors = ['#e74c3c','#3498db','#2ecc71','#e67e22','#9b59b6','#1abc9c','#f39c12','#e84393'];
+      const color = colors[window._savedLocations.length % colors.length];
+      const name = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+      const locData = { name, lat, lon, color };
+
+      if (_useServerAPI) {
+        const result = await apiRequest('POST', locData);
+        if (result && !result.error) {
+          window._savedLocations.push(result);
+        } else {
+          const loc = { ...locData, id: Date.now(), savedAt: new Date().toISOString() };
+          window._savedLocations.push(loc);
+          writeLocalLocations(window._savedLocations);
+        }
+      } else {
+        const loc = { ...locData, id: Date.now(), savedAt: new Date().toISOString() };
+        window._savedLocations.push(loc);
+        writeLocalLocations(window._savedLocations);
+      }
+
+      renderSavedMarkers();
+    }
+
+    async function deleteSavedLocation(index) {
+      const loc = window._savedLocations[index];
+      if (!loc) return;
+
+      if (_useServerAPI) {
+        await apiRequest('DELETE', null, loc.id);
+      }
+      window._savedLocations.splice(index, 1);
+      if (!_useServerAPI) writeLocalLocations(window._savedLocations);
+      renderSavedMarkers();
+    }
+
+    async function editSavedLocation(index) {
+      const loc = window._savedLocations[index];
+      if (!loc) return;
+      const newName = prompt('Name:', loc.name);
+      if (newName === null) return;
+      const newNote = prompt('Note (leave empty for none):', loc.note || '');
+      if (newNote === null) return;
+
+      loc.name = newName || loc.name;
+      loc.note = newNote || '';
+
+      if (_useServerAPI) {
+        await apiRequest('PATCH', { name: loc.name, note: loc.note }, loc.id);
+      } else {
+        writeLocalLocations(window._savedLocations);
+      }
+      renderSavedMarkers();
+    }
+
+    function flyToSaved(index) {
+      const loc = window._savedLocations[index];
+      if (!loc) return;
+      map.flyTo({ center: [loc.lon, loc.lat], zoom: 13, duration: 1500 });
+      if (window._savedMarkers[index]) {
+        window._savedMarkers[index].togglePopup();
+      }
+    }
+
+    async function clearAllSaved() {
+      if (!confirm('Clear all saved locations?')) return;
+      if (_useServerAPI) {
+        await apiRequest('DELETE');
+      }
+      window._savedLocations = [];
+      if (!_useServerAPI) writeLocalLocations([]);
+      renderSavedMarkers();
+    }
+
+    function downloadSaved() {
+      const locs = window._savedLocations;
+      if (locs.length === 0) { alert('No saved locations to download.'); return; }
+
+      const geojson = {
+        type: 'FeatureCollection',
+        features: locs.map(loc => ({
+          type: 'Feature',
+          properties: { name: loc.name, note: loc.note || '', color: loc.color, savedAt: loc.savedAt },
+          geometry: { type: 'Point', coordinates: [loc.lon, loc.lat] }
+        }))
+      };
+
+      const blob = new Blob([JSON.stringify(geojson, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'saved_locations.geojson';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function renderSavedMarkers() {
+      const locs = window._savedLocations;
+      const list = document.getElementById('saved-list');
+
+      // Clear old markers
+      window._savedMarkers.forEach(m => m.remove());
+      window._savedMarkers = [];
+
+      if (locs.length === 0) {
+        list.innerHTML = '<div class="saved-empty">No saved locations yet</div>';
+        return;
+      }
+
+      list.innerHTML = locs.map((loc, i) => `
+        <div class="saved-item">
+          <div class="saved-color" style="background:${loc.color}"></div>
+          <span class="saved-name" title="${loc.lat.toFixed(5)}, ${loc.lon.toFixed(5)}" onclick="flyToSaved(${i})">${loc.name}</span>
+          <button class="saved-edit" title="Edit" onclick="editSavedLocation(${i})">✎</button>
+          <button class="saved-del" title="Delete" onclick="deleteSavedLocation(${i})">×</button>
+        </div>
+        ${loc.note ? `<div class="saved-note">${loc.note}</div>` : ''}
+      `).join('');
+
+      // Add persistent markers to map
+      locs.forEach((loc, i) => {
+        const el = document.createElement('div');
+        el.style.cssText = `width:20px;height:20px;background:${loc.color};border-radius:50%;border:2.5px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.4);cursor:pointer;`;
+        let popupHtml = `<div style="font-size:12px;"><b>${loc.name}</b><br>${loc.lat.toFixed(5)}, ${loc.lon.toFixed(5)}`;
+        if (loc.note) popupHtml += `<br><i style="color:#666;">${loc.note}</i>`;
+        popupHtml += '</div>';
+        const marker = new maplibregl.Marker({ element: el })
+          .setLngLat([loc.lon, loc.lat])
+          .setPopup(new maplibregl.Popup({ maxWidth: '240px' }).setHTML(popupHtml))
+          .addTo(map);
+        window._savedMarkers.push(marker);
+      });
+    }
+
+    // Load saved locations on map ready
+    map.on('load', () => { loadSavedLocations(); });
+
+    // ── Ruler / Distance Measurement ──
+
+    let rulerMode = false;
+    let rulerPoints = [];
+    window._rulerMarkers = [];
+
+    function haversineDistance(lat1, lon1, lat2, lon2) {
+      const R = 6371000; // meters
+      const toRad = d => d * Math.PI / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2)**2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    function formatDistance(meters) {
+      if (meters < 1000) return `${Math.round(meters)} m`;
+      return `${(meters / 1000).toFixed(2)} km`;
+    }
+
+    function toggleRuler() {
+      rulerMode = document.getElementById('toggle-ruler').checked;
+      const result = document.getElementById('ruler-result');
+      if (rulerMode) {
+        result.textContent = 'Click map points to measure. Click 2+ points.';
+        map.getCanvas().style.cursor = 'crosshair';
+      } else {
+        clearRuler();
+        map.getCanvas().style.cursor = inspectMode ? 'crosshair' : '';
+      }
+    }
+
+    function clearRuler() {
+      rulerPoints = [];
+      window._rulerMarkers.forEach(m => m.remove());
+      window._rulerMarkers = [];
+      if (map.getLayer('ruler-line')) map.removeLayer('ruler-line');
+      if (map.getSource('ruler-line')) map.removeSource('ruler-line');
+      document.getElementById('ruler-result').textContent = '';
+    }
+
+    function updateRulerLine() {
+      if (map.getLayer('ruler-line')) map.removeLayer('ruler-line');
+      if (map.getSource('ruler-line')) map.removeSource('ruler-line');
+
+      if (rulerPoints.length < 2) return;
+
+      map.addSource('ruler-line', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          geometry: { type: 'LineString', coordinates: rulerPoints.map(p => [p.lon, p.lat]) }
+        }
+      });
+      map.addLayer({
+        id: 'ruler-line',
+        type: 'line',
+        source: 'ruler-line',
+        paint: { 'line-color': '#ff4444', 'line-width': 2.5, 'line-dasharray': [4, 3] }
+      });
+
+      // Calculate total distance
+      let total = 0;
+      const segments = [];
+      for (let i = 1; i < rulerPoints.length; i++) {
+        const d = haversineDistance(rulerPoints[i-1].lat, rulerPoints[i-1].lon, rulerPoints[i].lat, rulerPoints[i].lon);
+        total += d;
+        segments.push(d);
+      }
+
+      const result = document.getElementById('ruler-result');
+      if (segments.length === 1) {
+        result.textContent = `Distance: ${formatDistance(total)}`;
+      } else {
+        const segText = segments.map((s, i) => `${i+1}: ${formatDistance(s)}`).join(' | ');
+        result.innerHTML = `Total: <b>${formatDistance(total)}</b><br><span style="font-size:10px;">${segText}</span>`;
+      }
+    }
+
+    function addRulerPoint(lat, lon) {
+      rulerPoints.push({ lat, lon });
+
+      const el = document.createElement('div');
+      el.style.cssText = 'width:12px;height:12px;background:#ff4444;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.5);';
+      const marker = new maplibregl.Marker({ element: el }).setLngLat([lon, lat]).addTo(map);
+      window._rulerMarkers.push(marker);
+
+      updateRulerLine();
+    }
+
+    // Click on map shows coordinates + ruler + inspect
     map.on('click', e => {
       document.getElementById('coord-lat').value = e.lngLat.lat.toFixed(5);
       document.getElementById('coord-lon').value = e.lngLat.lng.toFixed(5);
       document.getElementById('coord-display').textContent = `${e.lngLat.lat.toFixed(5)}, ${e.lngLat.lng.toFixed(5)}`;
       document.getElementById('coord-display').style.color = '#888';
+      if (rulerMode) addRulerPoint(e.lngLat.lat, e.lngLat.lng);
+      if (inspectMode) inspectPoint(e.lngLat.lat, e.lngLat.lng);
     });
   </script>
 </body>

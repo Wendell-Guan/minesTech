@@ -46,11 +46,11 @@ def build_mining_detection(year):
 
     # Water mask: JRC buffered + coastal
     jrc = ee.Image('JRC/GSW1_4/GlobalSurfaceWater')
-    water_mask = jrc.select('occurrence').gt(5)
-    water_buffered = water_mask.focal_max(radius=100, units='meters')
+    water_mask = jrc.select('occurrence').gt(5).unmask(0)
+    water_buffered = water_mask.focal_max(radius=50, units='meters')
     srtm = ee.Image('USGS/SRTMGL1_003').select('elevation')
-    coastal_flat = srtm.lt(5)
-    land_only = water_buffered.Or(coastal_flat).Not()
+    coastal_flat = srtm.lt(5).unmask(0)
+    all_water = water_buffered.Or(coastal_flat)
 
     # Cloud-masked Sentinel-2 composite
     s2 = (ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
@@ -69,21 +69,31 @@ def build_mining_detection(year):
         {'SWIR1': s2.select('B11'), 'RED': s2.select('B4'),
          'NIR': s2.select('B8'), 'BLUE': s2.select('B2')})
 
-    # Broad mining detection
-    mining = (ndvi.lt(0.45)
-              .And(bsi.gt(-0.05))
-              .And(s2.select('B11').gt(700)))
+    # Aggressive mining detection
+    mining = (ndvi.lt(0.6)
+              .And(bsi.gt(-0.2))
+              .And(s2.select('B11').gt(400)))
 
-    # Strict water exclusion
-    mining = mining.And(land_only)
-    mining = mining.And(ndwi.lt(-0.1))
-    mining = mining.And(mndwi.lt(0.0))
+    near_water_excavation = (ndvi.lt(0.35)
+                             .And(bsi.gt(0.05))
+                             .And(s2.select('B11').gt(1000))
+                             .And(ndwi.lt(0.0))
+                             .And(mndwi.lt(0.1))
+                             .And(s2.select('B8').gt(s2.select('B3'))))
+
+    land_context = (all_water.Not()
+                    .Or(near_water_excavation
+                        .And(water_mask.Not())
+                        .And(coastal_flat.Not())))
+
+    # Water exclusion
+    mining = mining.And(land_context)
+    mining = mining.And(ndwi.lt(0.05))
+    mining = mining.And(mndwi.lt(0.15))
     mining = mining.And(s2.select('B8').gt(s2.select('B3')))
 
-    # Morphological cleaning
-    mining_cleaned = (mining
-                      .focal_min(radius=30, units='meters')
-                      .focal_max(radius=30, units='meters'))
+    # No morphological cleaning - preserve small features
+    mining_cleaned = mining
 
     return mining_cleaned.selfMask().clip(suriname)
 
