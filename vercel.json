@@ -1,0 +1,10 @@
+{
+  "rewrites": [
+    { "source": "/api/detect", "destination": "/api/detect" }
+  ],
+  "functions": {
+    "api/detect.py": {
+      "maxDuration": 60
+    }
+  }
+}

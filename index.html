@@ -30,225 +30,110 @@
       align-items: center;
       gap: 10px;
     }
-    .sidebar-header h1 {
-      font-size: 16px;
-      font-weight: 600;
-    }
+    .sidebar-header h1 { font-size: 16px; font-weight: 600; }
     .sidebar-header .logo {
-      width: 28px;
-      height: 28px;
-      background: #e6a817;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
+      width: 28px; height: 28px;
+      background: #e6a817; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
     }
-
     .sidebar-section {
       padding: 14px 16px;
       border-bottom: 1px solid #eee;
     }
     .sidebar-section h3 {
-      font-size: 12px;
-      text-transform: uppercase;
-      color: #888;
-      margin-bottom: 10px;
-      letter-spacing: 0.5px;
+      font-size: 12px; text-transform: uppercase; color: #888;
+      margin-bottom: 10px; letter-spacing: 0.5px;
     }
 
     /* Layer toggles */
     .layer-toggle {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 6px 0;
-      cursor: pointer;
-      font-size: 14px;
+      display: flex; align-items: center; gap: 10px;
+      padding: 6px 0; cursor: pointer; font-size: 14px;
     }
     .layer-toggle input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
-      accent-color: #e6a817;
+      width: 16px; height: 16px; accent-color: #e6a817;
     }
     .layer-color {
-      width: 14px;
-      height: 14px;
-      border-radius: 3px;
-      flex-shrink: 0;
+      width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0;
     }
 
+    /* Opacity control */
+    .opacity-control {
+      display: flex; align-items: center; gap: 8px;
+      margin-top: 6px; font-size: 12px; color: #666;
+    }
+    .opacity-control input { flex: 1; accent-color: #e6a817; }
+
     /* Year slider */
-    .year-control {
-      padding: 14px 16px;
-    }
+    .year-control { padding: 14px 16px; }
     .year-display {
-      text-align: center;
-      font-size: 28px;
-      font-weight: 700;
-      color: #1a1a2e;
-      margin-bottom: 8px;
+      text-align: center; font-size: 28px; font-weight: 700;
+      color: #1a1a2e; margin-bottom: 4px;
     }
-    .year-slider {
-      width: 100%;
-      accent-color: #e6a817;
-    }
+    .year-slider { width: 100%; accent-color: #e6a817; }
     .year-range {
-      display: flex;
-      justify-content: space-between;
-      font-size: 11px;
-      color: #999;
-      margin-top: 4px;
+      display: flex; justify-content: space-between;
+      font-size: 11px; color: #999; margin-top: 4px;
     }
 
     /* Legend */
     .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 4px 0;
-      font-size: 13px;
-      color: #444;
+      display: flex; align-items: center; gap: 8px;
+      padding: 4px 0; font-size: 13px; color: #444;
     }
     .legend-dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 3px;
-      flex-shrink: 0;
+      width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0;
     }
+    .legend-tag {
+      font-size: 10px; padding: 1px 6px; border-radius: 3px;
+      margin-left: auto;
+    }
+    .tag-confirmed { background: #fde8e8; color: #af2a2a; }
+    .tag-detected { background: #fef6e0; color: #b8860b; }
 
     /* Loading overlay */
     .loading-overlay {
-      position: absolute;
-      top: 50%;
-      left: 50%;
+      position: absolute; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(26, 26, 46, 0.9);
-      color: #fff;
-      padding: 16px 28px;
-      border-radius: 8px;
-      font-size: 14px;
-      z-index: 20;
-      display: none;
+      background: rgba(26, 26, 46, 0.9); color: #fff;
+      padding: 16px 28px; border-radius: 8px;
+      font-size: 14px; z-index: 20; display: none;
     }
     .loading-overlay.active { display: block; }
 
-    /* Opacity control */
-    .opacity-control {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 8px;
-      font-size: 12px;
-      color: #666;
-    }
-    .opacity-control input {
-      flex: 1;
-      accent-color: #e6a817;
-    }
-
     /* Info badge */
     .info-badge {
-      position: absolute;
-      bottom: 30px;
-      left: 12px;
-      background: #fff;
-      padding: 8px 14px;
-      border-radius: 8px;
+      position: absolute; bottom: 30px; left: 12px;
+      background: #fff; padding: 8px 14px; border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-      font-size: 12px;
-      color: #666;
-      z-index: 10;
-    }
-    .info-badge a {
-      color: #e6a817;
-      text-decoration: none;
-    }
-
-    /* All coverage toggle */
-    .coverage-mode {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 10px;
-    }
-    .coverage-btn {
-      flex: 1;
-      padding: 6px 8px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      background: #fff;
-      font-size: 12px;
-      cursor: pointer;
-      text-align: center;
-      transition: all 0.2s;
-    }
-    .coverage-btn.active {
-      background: #1a1a2e;
-      color: #fff;
-      border-color: #1a1a2e;
+      font-size: 12px; color: #666; z-index: 10;
     }
 
     /* Mobile toggle button */
     .sidebar-toggle {
-      display: none;
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      width: 40px;
-      height: 40px;
-      background: #1a1a2e;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 20px;
-      z-index: 11;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      display: none; position: absolute; top: 12px; left: 12px;
+      width: 40px; height: 40px; background: #1a1a2e; color: #fff;
+      border: none; border-radius: 8px; font-size: 20px;
+      z-index: 11; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
 
     /* Mobile responsive */
     @media (max-width: 600px) {
       .sidebar {
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: auto;
-        max-height: 70vh;
-        border-radius: 0 0 14px 14px;
-        overflow-y: auto;
-        transform: translateY(-100%);
-        transition: transform 0.3s ease;
+        top: 0; left: 0; width: 100%; height: auto; max-height: 70vh;
+        border-radius: 0 0 14px 14px; overflow-y: auto;
+        transform: translateY(-100%); transition: transform 0.3s ease;
       }
-      .sidebar.open {
-        transform: translateY(0);
-      }
-      .sidebar-toggle {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .sidebar.open ~ .sidebar-toggle {
-        display: none;
-      }
-      .sidebar-header {
-        position: sticky;
-        top: 0;
-        z-index: 2;
-      }
+      .sidebar.open { transform: translateY(0); }
+      .sidebar-toggle { display: flex; align-items: center; justify-content: center; }
+      .sidebar.open ~ .sidebar-toggle { display: none; }
+      .sidebar-header { position: sticky; top: 0; z-index: 2; }
       .sidebar-close {
-        display: block !important;
-        margin-left: auto;
-        background: none;
-        border: none;
-        color: #fff;
-        font-size: 22px;
-        cursor: pointer;
+        display: block !important; margin-left: auto;
+        background: none; border: none; color: #fff; font-size: 22px; cursor: pointer;
       }
       .info-badge {
-        bottom: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        white-space: nowrap;
+        bottom: 10px; left: 50%; transform: translateX(-50%); white-space: nowrap;
       }
     }
     @media (min-width: 601px) {
@@ -268,60 +153,69 @@
     </div>
 
     <div class="sidebar-section">
-      <h3>Display Mode</h3>
-      <div class="coverage-mode">
-        <button class="coverage-btn active" data-mode="mining" onclick="switchMode('mining')">Mining Only</button>
-        <button class="coverage-btn" data-mode="all" onclick="switchMode('all')">All Coverage</button>
+      <h3>View</h3>
+      <label class="layer-toggle">
+        <input type="checkbox" id="toggle-3d" onchange="toggle3D()">
+        <span style="font-size:16px;">🏔</span>
+        <span>3D Terrain</span>
+      </label>
+      <div class="opacity-control" id="exaggeration-control" style="display:none;">
+        <span>Height</span>
+        <input type="range" id="exaggeration-slider" min="1" max="5" value="2" step="0.5" oninput="setExaggeration(this.value)">
+        <span id="exaggeration-val">2x</span>
       </div>
     </div>
 
     <div class="sidebar-section">
       <h3>Layers</h3>
+
       <label class="layer-toggle">
-        <input type="checkbox" id="toggle-coverage" checked onchange="toggleLayer()">
+        <input type="checkbox" id="toggle-confirmed" checked onchange="toggleConfirmed()">
         <span class="layer-color" style="background: #af2a2a;"></span>
-        <span>MapBiomas Coverage</span>
+        <span>Confirmed Mining (2023)</span>
       </label>
       <div class="opacity-control">
         <span>Opacity</span>
-        <input type="range" id="opacity-slider" min="0" max="100" value="80" oninput="setOpacity(this.value)">
-        <span id="opacity-val">80%</span>
+        <input type="range" id="opacity-confirmed" min="0" max="100" value="80" oninput="setConfirmedOpacity(this.value)">
+        <span id="opacity-confirmed-val">80%</span>
+      </div>
+
+      <label class="layer-toggle" style="margin-top:10px;">
+        <input type="checkbox" id="toggle-detected" checked onchange="toggleDetected()">
+        <span class="layer-color" style="background: #e6a817;"></span>
+        <span>New Detected Mining</span>
+      </label>
+      <div class="opacity-control">
+        <span>Opacity</span>
+        <input type="range" id="opacity-detected" min="0" max="100" value="80" oninput="setDetectedOpacity(this.value)">
+        <span id="opacity-detected-val">80%</span>
       </div>
     </div>
 
-    <div class="sidebar-section" id="legend-section">
+    <div class="sidebar-section">
       <h3>Legend</h3>
-      <div id="legend-mining">
-        <div class="legend-item">
-          <div class="legend-dot" style="background: #af2a2a;"></div>
-          <span>Mining</span>
-        </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #af2a2a;"></div>
+        <span>Confirmed Mining</span>
+        <span class="legend-tag tag-confirmed">MapBiomas</span>
       </div>
-      <div id="legend-all" style="display:none;">
-        <div class="legend-item"><div class="legend-dot" style="background: #1f8d49;"></div><span>Forest Formation</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background: #7dc975;"></div><span>Savanna Formation</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background: #04381d;"></div><span>Mangrove</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background: #026975;"></div><span>Floodable Forest</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background: #02d659;"></div><span>Wooded Sandbank Vegetation</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background: #ad975a;"></div><span>Other Non-Forest Formations</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background: #ffd966;"></div><span>Pasture</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background: #e6b655;"></div><span>Agriculture</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background: #af2a2a;"></div><span>Mining</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background: #d082de;"></div><span>Urban</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background: #0000ff;"></div><span>River, Lake, Ocean</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background: #d68fe2;"></div><span>Non-Observed</span></div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background: #e6a817;"></div>
+        <span>Detected Mining</span>
+        <span class="legend-tag tag-detected">Sentinel-2</span>
       </div>
     </div>
 
     <div class="year-control">
-      <h3 style="font-size:12px;text-transform:uppercase;color:#888;letter-spacing:0.5px;margin-bottom:10px;">Year</h3>
-      <div class="year-display" id="year-display">2023</div>
-      <input type="range" class="year-slider" id="year-slider" min="1985" max="2023" value="2023" oninput="onYearChange(this.value)">
+      <h3 style="font-size:12px;text-transform:uppercase;color:#888;letter-spacing:0.5px;margin-bottom:10px;">Detection Year</h3>
+      <div class="year-display" id="year-display">2024</div>
+      <input type="range" class="year-slider" id="year-slider" min="2024" max="2026" value="2024" step="1" oninput="onYearChange(this.value)">
       <div class="year-range">
-        <span>1985</span>
-        <span>2000</span>
-        <span>2023</span>
+        <span>2024</span>
+        <span>2025</span>
+        <span>2026</span>
       </div>
+      <div id="detection-status" style="text-align:center;font-size:11px;color:#888;margin-top:8px;"></div>
     </div>
   </div>
 
@@ -335,16 +229,13 @@
   <script>
     // Config
     const MAPBIOMAS_API = 'https://prd.plataforma.mapbiomas.org/api/v1/pan-amazonia/maps/map/';
+    // Auto-detect: use relative path on Vercel, localhost for dev
+    const IS_LOCAL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const GEE_API = IS_LOCAL ? 'http://localhost:5001/api' : '/api';
     const SURINAME_CENTER = [-55.9, 4.0];
     const SURINAME_ZOOM = 7;
 
-    // Mining pixel value = 30
-    const MINING_PIXELS = [30];
-    // All coverage pixel values
-    const ALL_PIXELS = [3,4,5,6,11,12,29,13,15,18,9,35,21,23,24,30,68,25,33,34,27];
-
-    let currentYear = 2023;
-    let currentMode = 'mining';
+    let currentDetectionYear = 2024;
     let map;
     let debounceTimer;
 
@@ -361,6 +252,15 @@
             ],
             tileSize: 256,
             attribution: ''
+          },
+          'terrain-dem': {
+            type: 'raster-dem',
+            tiles: [
+              'https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png'
+            ],
+            tileSize: 256,
+            encoding: 'terrarium',
+            maxzoom: 15
           }
         },
         layers: [{
@@ -381,21 +281,103 @@
     map.addControl(new maplibregl.ScaleControl({ maxWidth: 150 }), 'bottom-right');
 
     map.on('load', () => {
-      loadMapBiomasTiles(currentYear, getPixels());
+      loadConfirmedMining();
+      loadDetectedMining(currentDetectionYear);
       loadSurinameBorder();
     });
+
+    // ── Layer 1: Confirmed Mining (MapBiomas 2023, red, always on) ──
+
+    async function loadConfirmedMining() {
+      try {
+        const params = new URLSearchParams();
+        params.set('territoryId', '19-72-1');
+        params.set('subthemeKey', 'coverage_lclu');
+        params.set('legendKey', 'default');
+        params.set('year', '2023');
+        params.set('view3D', 'false');
+        params.set('territoryCategoryId', '68');
+        params.append('pixelValue', '30');
+
+        const resp = await fetch(`${MAPBIOMAS_API}?${params}`);
+        const data = await resp.json();
+        if (!data.url) return;
+
+        map.addSource('confirmed-mining', {
+          type: 'raster',
+          tiles: [data.url],
+          tileSize: 256
+        });
+
+        map.addLayer({
+          id: 'confirmed-mining-layer',
+          type: 'raster',
+          source: 'confirmed-mining',
+          paint: { 'raster-opacity': 0.8 }
+        });
+      } catch (err) {
+        console.error('Failed to load confirmed mining:', err);
+      }
+    }
+
+    // ── Layer 2: Detected Mining (GEE Sentinel-2, yellow, per year) ──
+
+    async function loadDetectedMining(year) {
+      const loading = document.getElementById('loading');
+      const status = document.getElementById('detection-status');
+      loading.classList.add('active');
+      status.textContent = 'Loading detection...';
+
+      try {
+        // Works for both local (Flask) and Vercel (serverless)
+        const url = IS_LOCAL
+          ? `${GEE_API}/detect/${year}`
+          : `${GEE_API}/detect?year=${year}`;
+        const resp = await fetch(url);
+        const data = await resp.json();
+        if (data.error) throw new Error(data.error);
+
+        applyDetectedLayer(data.url);
+        status.textContent = `Detection loaded for ${year}`;
+        loading.classList.remove('active');
+      } catch (err) {
+        console.error('Failed to load detected mining:', err);
+        status.textContent = IS_LOCAL
+          ? 'GEE backend offline - start server.py'
+          : 'Detection service error';
+        status.style.color = '#af2a2a';
+        loading.classList.remove('active');
+      }
+    }
+
+    function applyDetectedLayer(tileUrl) {
+      if (map.getLayer('detected-mining-layer')) map.removeLayer('detected-mining-layer');
+      if (map.getSource('detected-mining')) map.removeSource('detected-mining');
+
+      map.addSource('detected-mining', {
+        type: 'raster',
+        tiles: [tileUrl],
+        tileSize: 256
+      });
+
+      const opacity = parseInt(document.getElementById('opacity-detected').value) / 100;
+      map.addLayer({
+        id: 'detected-mining-layer',
+        type: 'raster',
+        source: 'detected-mining',
+        paint: { 'raster-opacity': opacity }
+      });
+    }
+
+    // ── Suriname Border ──
 
     async function loadSurinameBorder() {
       try {
         const resp = await fetch('https://geodata.ucdavis.edu/gadm/gadm4.1/json/gadm41_SUR_0.json');
         const geojson = await resp.json();
 
-        map.addSource('suriname-border', {
-          type: 'geojson',
-          data: geojson
-        });
+        map.addSource('suriname-border', { type: 'geojson', data: geojson });
 
-        // Border outline
         map.addLayer({
           id: 'suriname-border-line',
           type: 'line',
@@ -407,7 +389,6 @@
           }
         });
 
-        // Country label
         map.addLayer({
           id: 'suriname-label',
           type: 'symbol',
@@ -429,98 +410,85 @@
       }
     }
 
-    function getPixels() {
-      return currentMode === 'mining' ? MINING_PIXELS : ALL_PIXELS;
-    }
-
-    async function loadMapBiomasTiles(year, pixelValues) {
-      const loading = document.getElementById('loading');
-      loading.classList.add('active');
-
-      try {
-        const params = new URLSearchParams();
-        params.set('territoryId', '19-72-1');
-        params.set('subthemeKey', 'coverage_lclu');
-        params.set('legendKey', 'default');
-        params.set('year', year.toString());
-        params.set('view3D', 'false');
-        params.set('territoryCategoryId', '68');
-        pixelValues.forEach(v => params.append('pixelValue', v.toString()));
-
-        const resp = await fetch(`${MAPBIOMAS_API}?${params}`);
-        const data = await resp.json();
-
-        if (!data.url) {
-          console.error('No tile URL returned', data);
-          loading.classList.remove('active');
-          return;
-        }
-
-        // Remove old layer and source
-        if (map.getLayer('mapbiomas-layer')) {
-          map.removeLayer('mapbiomas-layer');
-        }
-        if (map.getSource('mapbiomas')) {
-          map.removeSource('mapbiomas');
-        }
-
-        // Add new source and layer
-        map.addSource('mapbiomas', {
-          type: 'raster',
-          tiles: [data.url],
-          tileSize: 256
-        });
-
-        const opacity = parseInt(document.getElementById('opacity-slider').value) / 100;
-        map.addLayer({
-          id: 'mapbiomas-layer',
-          type: 'raster',
-          source: 'mapbiomas',
-          paint: {
-            'raster-opacity': opacity
-          }
-        });
-
-        loading.classList.remove('active');
-      } catch (err) {
-        console.error('Failed to load MapBiomas tiles:', err);
-        loading.classList.remove('active');
-      }
-    }
+    // ── Controls ──
 
     function onYearChange(year) {
       document.getElementById('year-display').textContent = year;
-      currentYear = parseInt(year);
+      currentDetectionYear = parseInt(year);
+      document.getElementById('detection-status').style.color = '#888';
 
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
-        loadMapBiomasTiles(currentYear, getPixels());
+        loadDetectedMining(currentDetectionYear);
       }, 300);
     }
 
-    function switchMode(mode) {
-      currentMode = mode;
-      document.querySelectorAll('.coverage-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.mode === mode);
-      });
-
-      document.getElementById('legend-mining').style.display = mode === 'mining' ? 'block' : 'none';
-      document.getElementById('legend-all').style.display = mode === 'all' ? 'block' : 'none';
-
-      loadMapBiomasTiles(currentYear, getPixels());
-    }
-
-    function toggleLayer() {
-      const visible = document.getElementById('toggle-coverage').checked;
-      if (map.getLayer('mapbiomas-layer')) {
-        map.setLayoutProperty('mapbiomas-layer', 'visibility', visible ? 'visible' : 'none');
+    function toggleConfirmed() {
+      const visible = document.getElementById('toggle-confirmed').checked;
+      if (map.getLayer('confirmed-mining-layer')) {
+        map.setLayoutProperty('confirmed-mining-layer', 'visibility', visible ? 'visible' : 'none');
       }
     }
 
-    function setOpacity(val) {
-      document.getElementById('opacity-val').textContent = val + '%';
-      if (map.getLayer('mapbiomas-layer')) {
-        map.setPaintProperty('mapbiomas-layer', 'raster-opacity', parseInt(val) / 100);
+    function toggleDetected() {
+      const visible = document.getElementById('toggle-detected').checked;
+      if (map.getLayer('detected-mining-layer')) {
+        map.setLayoutProperty('detected-mining-layer', 'visibility', visible ? 'visible' : 'none');
+      }
+    }
+
+    function setConfirmedOpacity(val) {
+      document.getElementById('opacity-confirmed-val').textContent = val + '%';
+      if (map.getLayer('confirmed-mining-layer')) {
+        map.setPaintProperty('confirmed-mining-layer', 'raster-opacity', parseInt(val) / 100);
+      }
+    }
+
+    function setDetectedOpacity(val) {
+      document.getElementById('opacity-detected-val').textContent = val + '%';
+      if (map.getLayer('detected-mining-layer')) {
+        map.setPaintProperty('detected-mining-layer', 'raster-opacity', parseInt(val) / 100);
+      }
+    }
+
+    // ── 3D Terrain ──
+
+    let is3D = false;
+
+    function toggle3D() {
+      is3D = document.getElementById('toggle-3d').checked;
+      document.getElementById('exaggeration-control').style.display = is3D ? 'flex' : 'none';
+
+      if (is3D) {
+        const exaggeration = parseFloat(document.getElementById('exaggeration-slider').value);
+        map.setTerrain({ source: 'terrain-dem', exaggeration: exaggeration });
+
+        // Add sky for better 3D look
+        if (!map.getLayer('sky')) {
+          map.addLayer({
+            id: 'sky',
+            type: 'sky',
+            paint: {
+              'sky-type': 'atmosphere',
+              'sky-atmosphere-sun': [0, 20],
+              'sky-atmosphere-sun-intensity': 5
+            }
+          });
+        }
+
+        // Tilt the camera
+        map.easeTo({ pitch: 60, duration: 1000 });
+      } else {
+        map.setTerrain(null);
+        if (map.getLayer('sky')) map.removeLayer('sky');
+        map.easeTo({ pitch: 0, duration: 1000 });
+      }
+    }
+
+    function setExaggeration(val) {
+      document.getElementById('exaggeration-val').textContent = val + 'x';
+      if (is3D) {
+        map.setTerrain({ source: 'terrain-dem', exaggeration: parseFloat(val) });
       }
     }
   </script>
