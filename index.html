@@ -36,13 +36,60 @@
       background: #e6a817; border-radius: 6px;
       display: flex; align-items: center; justify-content: center; font-size: 16px;
     }
+    .sidebar-body {
+      max-height: calc(100vh - 60px);
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #ccc transparent;
+    }
+    .sidebar-body::-webkit-scrollbar { width: 4px; }
+    .sidebar-body::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
     .sidebar-section {
-      padding: 14px 16px;
+      padding: 0;
       border-bottom: 1px solid #eee;
     }
     .sidebar-section h3 {
       font-size: 12px; text-transform: uppercase; color: #888;
-      margin-bottom: 10px; letter-spacing: 0.5px;
+      letter-spacing: 0.5px;
+      padding: 10px 16px;
+      margin: 0;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between;
+      user-select: none;
+    }
+    .sidebar-section h3::after {
+      content: '▾'; font-size: 10px; color: #bbb; transition: transform 0.2s;
+    }
+    .sidebar-section.collapsed h3::after {
+      transform: rotate(-90deg);
+    }
+    .section-body {
+      padding: 0 16px 12px;
+      transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.25s ease;
+      max-height: 600px; opacity: 1; overflow: hidden;
+    }
+    .sidebar-section.collapsed .section-body {
+      max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0;
+    }
+    .year-control {
+      padding: 0; border-bottom: 1px solid #eee;
+    }
+    .year-control > h3 {
+      padding: 10px 16px; margin-bottom: 0;
+      cursor: pointer; display: flex; align-items: center; justify-content: space-between;
+      user-select: none;
+    }
+    .year-control > h3::after {
+      content: '▾'; font-size: 10px; color: #bbb; transition: transform 0.2s;
+    }
+    .year-control.collapsed > h3::after { transform: rotate(-90deg); }
+    .year-body {
+      padding: 0 16px 12px;
+      transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.25s ease;
+      max-height: 300px; opacity: 1; overflow: hidden;
+    }
+    .year-control.collapsed .year-body {
+      max-height: 0; opacity: 0; padding-top: 0; padding-bottom: 0;
     }
 
     /* Layer toggles */
@@ -65,7 +112,6 @@
     .opacity-control input { flex: 1; accent-color: #e6a817; }
 
     /* Year slider */
-    .year-control { padding: 14px 16px; }
     .year-display {
       text-align: center; font-size: 28px; font-weight: 700;
       color: #1a1a2e; margin-bottom: 4px;
@@ -321,224 +367,204 @@
       <button class="sidebar-close" onclick="document.querySelector('.sidebar').classList.remove('open')">✕</button>
     </div>
 
-    <div class="sidebar-section">
-      <h3>View</h3>
-      <label class="layer-toggle">
-        <input type="checkbox" id="toggle-3d" onchange="toggle3D()">
-        <span style="font-size:16px;">🏔</span>
-        <span>3D Terrain</span>
-      </label>
-      <label class="layer-toggle" style="margin-top:8px;">
-        <input type="checkbox" id="toggle-inspect" onchange="toggleInspectMode()">
-        <span style="font-size:16px;">⌖</span>
-        <span>Point Inspect</span>
-      </label>
-      <div class="inspect-note" id="inspect-status">Off. Enable Point Inspect, then click the map.</div>
-      <div class="opacity-control" id="exaggeration-control" style="display:none;">
-        <span>Height</span>
-        <input type="range" id="exaggeration-slider" min="1" max="5" value="2" step="0.5" oninput="setExaggeration(this.value)">
-        <span id="exaggeration-val">2x</span>
-      </div>
-      <label class="layer-toggle" style="margin-top:8px;">
-        <input type="checkbox" id="toggle-ruler" onchange="toggleRuler()">
-        <span style="font-size:16px;">📏</span>
-        <span>Measure Distance</span>
-      </label>
-      <div class="ruler-result" id="ruler-result"></div>
-    </div>
+    <div class="sidebar-body">
 
     <div class="sidebar-section">
-      <h3>Layers</h3>
-
-      <label class="layer-toggle">
-        <input type="checkbox" id="toggle-confirmed" checked onchange="toggleConfirmed()">
-        <span class="layer-color" style="background: #af2a2a;"></span>
-        <span>Confirmed Mining (2023)</span>
-      </label>
-      <div class="opacity-control">
-        <span>Opacity</span>
-        <input type="range" id="opacity-confirmed" min="0" max="100" value="80" oninput="setConfirmedOpacity(this.value)">
-        <span id="opacity-confirmed-val">80%</span>
-      </div>
-
-      <label class="layer-toggle" style="margin-top:10px;">
-        <input type="checkbox" id="toggle-detected" checked onchange="toggleDetected()">
-        <span class="layer-color" style="background: #e6a817;"></span>
-        <span>New Detected Mining</span>
-      </label>
-      <div class="opacity-control">
-        <span>Opacity</span>
-        <input type="range" id="opacity-detected" min="0" max="100" value="80" oninput="setDetectedOpacity(this.value)">
-        <span id="opacity-detected-val">80%</span>
-      </div>
-
-      <label class="layer-toggle" style="margin-top:10px;">
-        <input type="checkbox" id="toggle-amw" checked onchange="toggleAMW()">
-        <span class="layer-color" style="background: #2196F3;"></span>
-        <span>Amazon Mining Watch</span>
-      </label>
-      <div class="amw-mode-toggle">
-        <button class="amw-mode-btn active" id="amw-mode-cum" onclick="setAMWMode('cumulative')">Cumulative</button>
-        <button class="amw-mode-btn" id="amw-mode-single" onclick="setAMWMode('single')">Single period</button>
-      </div>
-      <div style="display:flex;align-items:center;gap:2px;margin-top:6px;">
-        <button class="amw-nav-btn" onclick="amwPeriodNav(-1)" title="Previous">&#8249;</button>
-        <div class="amw-period-btns" id="amw-period-btns"></div>
-        <button class="amw-nav-btn" onclick="amwPeriodNav(1)" title="Next">&#8250;</button>
-      </div>
-      <div class="amw-period-status" id="amw-period-status"></div>
-      <div class="opacity-control">
-        <span>Opacity</span>
-        <input type="range" id="opacity-amw" min="0" max="100" value="70" oninput="setAMWOpacity(this.value)">
-        <span id="opacity-amw-val">70%</span>
-      </div>
-
-      <label class="layer-toggle" style="margin-top:10px;">
-        <input type="checkbox" id="toggle-timeline" onchange="toggleTimeline()">
-        <span class="layer-color" style="background: linear-gradient(to right, #1a237e, #4a148c, #b71c1c); border-radius:3px;"></span>
-        <span>Mining Timeline</span>
-      </label>
-      <div class="opacity-control">
-        <span>Opacity</span>
-        <input type="range" id="opacity-timeline" min="0" max="100" value="80" oninput="setTimelineOpacity(this.value)">
-        <span id="opacity-timeline-val">80%</span>
-      </div>
-    </div>
-
-    <div class="sidebar-section">
-      <h3>Legend</h3>
-      <div class="legend-item">
-        <div class="legend-dot" style="background: #af2a2a;"></div>
-        <span>Confirmed Mining</span>
-        <span class="legend-tag tag-confirmed">MapBiomas</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-dot" style="background: #e6a817;"></div>
-        <span>Detected Mining</span>
-        <span class="legend-tag tag-detected">Sentinel-2</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-dot" style="background: linear-gradient(to right, #FFF9C4, #FFD54F, #EF5350); border-radius:3px;"></div>
-        <span>AI Detected Mining</span>
-        <span class="legend-tag" style="background:#FFF9C4;color:#C62828;" id="amw-legend-tag">AMW Cum.</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:4px;padding:2px 0 0 20px;font-size:10px;color:#888;">
-        <span style="width:18px;height:8px;background:#FFF9C4;border:1px solid #F9A825;border-radius:2px;display:inline-block;"></span>Older
-        <span style="width:18px;height:8px;background:#FFD54F;border:1px solid #F57F17;border-radius:2px;display:inline-block;margin-left:2px;"></span>
-        <span style="width:18px;height:8px;background:#EF5350;border:1px solid #C62828;border-radius:2px;display:inline-block;margin-left:2px;"></span>Recent
-      </div>
-      <div class="legend-item">
-        <div class="legend-dot" style="background: linear-gradient(to right, #1a237e, #b71c1c); border-radius:3px;"></div>
-        <span>Mining Timeline</span>
-        <span class="legend-tag" style="background:#f3e5f5;color:#4a148c;">2018–23</span>
-      </div>
-      <div style="display:flex;align-items:center;gap:3px;padding:4px 0 0 20px;font-size:10px;color:#888;">
-        <span style="width:14px;height:8px;background:#1a237e;border-radius:2px;display:inline-block;"></span>2018
-        <span style="width:14px;height:8px;background:#4a148c;border-radius:2px;display:inline-block;margin-left:2px;"></span>19
-        <span style="width:14px;height:8px;background:#880e4f;border-radius:2px;display:inline-block;margin-left:2px;"></span>20
-        <span style="width:14px;height:8px;background:#bf360c;border-radius:2px;display:inline-block;margin-left:2px;"></span>21
-        <span style="width:14px;height:8px;background:#e65100;border-radius:2px;display:inline-block;margin-left:2px;"></span>22
-        <span style="width:14px;height:8px;background:#f44336;border-radius:2px;display:inline-block;margin-left:2px;"></span>23
+      <h3 onclick="this.parentElement.classList.toggle('collapsed')">Layers</h3>
+      <div class="section-body">
+        <label class="layer-toggle">
+          <input type="checkbox" id="toggle-confirmed" checked onchange="toggleConfirmed()">
+          <span class="layer-color" style="background: #af2a2a;"></span>
+          <span>Confirmed Mining</span>
+        </label>
+        <label class="layer-toggle" style="margin-top:6px;">
+          <input type="checkbox" id="toggle-detected" checked onchange="toggleDetected()">
+          <span class="layer-color" style="background: #e6a817;"></span>
+          <span>Detected Mining</span>
+        </label>
+        <label class="layer-toggle" style="margin-top:6px;">
+          <input type="checkbox" id="toggle-amw" checked onchange="toggleAMW()">
+          <span class="layer-color" style="background: #2196F3;"></span>
+          <span>Amazon Mining Watch</span>
+        </label>
+        <div class="amw-mode-toggle">
+          <button class="amw-mode-btn active" id="amw-mode-cum" onclick="setAMWMode('cumulative')">Cumulative</button>
+          <button class="amw-mode-btn" id="amw-mode-single" onclick="setAMWMode('single')">Single period</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:2px;margin-top:6px;">
+          <button class="amw-nav-btn" onclick="amwPeriodNav(-1)" title="Previous">&#8249;</button>
+          <div class="amw-period-btns" id="amw-period-btns"></div>
+          <button class="amw-nav-btn" onclick="amwPeriodNav(1)" title="Next">&#8250;</button>
+        </div>
+        <div class="amw-period-status" id="amw-period-status"></div>
+        <label class="layer-toggle" style="margin-top:6px;">
+          <input type="checkbox" id="toggle-timeline" onchange="toggleTimeline()">
+          <span class="layer-color" style="background: linear-gradient(to right, #1a237e, #4a148c, #b71c1c); border-radius:3px;"></span>
+          <span>Mining Timeline</span>
+        </label>
       </div>
     </div>
 
     <div class="year-control">
-      <h3 style="font-size:12px;text-transform:uppercase;color:#888;letter-spacing:0.5px;margin-bottom:10px;">Detection Year</h3>
-      <div class="year-display" id="year-display">2024</div>
-      <input type="range" class="year-slider" id="year-slider" min="2018" max="2026" value="2024" step="1" oninput="onYearChange(this.value)">
-      <div class="year-range">
-        <span>2018</span>
-        <span>2022</span>
-        <span>2026</span>
-      </div>
-      <div id="detection-status" style="text-align:center;font-size:11px;color:#888;margin-top:8px;"></div>
-      <label class="layer-toggle" style="margin-top:8px;">
-        <input type="checkbox" id="toggle-historical-basemap" onchange="toggleHistoricalBasemap()">
-        <span class="layer-color" style="background: linear-gradient(135deg, #2e7d32, #4caf50); border-radius:3px;"></span>
-        <span style="font-size:12px;">Historical Satellite Imagery</span>
-      </label>
-      <div class="opacity-control" id="basemap-opacity-control" style="display:none;">
-        <span>Blend</span>
-        <input type="range" id="opacity-basemap" min="0" max="100" value="70" oninput="setBasemapOpacity(this.value)">
-        <span id="opacity-basemap-val">70%</span>
-      </div>
-      <div id="basemap-status" style="text-align:center;font-size:10px;color:#888;margin-top:2px;"></div>
-    </div>
-
-    <div class="sidebar-section">
-      <h3>Go to Coordinates</h3>
-      <div style="display:flex;gap:6px;">
-        <input type="text" id="coord-lat" placeholder="Lat (e.g. 4.5)" style="flex:1;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
-        <input type="text" id="coord-lon" placeholder="Lon (e.g. -55.2)" style="flex:1;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:13px;">
-      </div>
-      <button onclick="goToCoords()" style="width:100%;margin-top:6px;padding:7px;background:#1a1a2e;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;">Go</button>
-      <div id="coord-display" style="text-align:center;font-size:11px;color:#888;margin-top:6px;"></div>
-    </div>
-
-    <div class="sidebar-section">
-      <h3>Saved Locations</h3>
-      <div class="saved-list" id="saved-list">
-        <div class="saved-empty">No saved locations yet</div>
-      </div>
-      <div class="saved-actions">
-        <button class="btn-download" onclick="downloadSaved()">Download</button>
-        <button class="btn-clear-saved" onclick="clearAllSaved()">Clear All</button>
+      <h3 style="font-size:12px;text-transform:uppercase;color:#888;letter-spacing:0.5px;" onclick="this.parentElement.classList.toggle('collapsed')">Detection Year</h3>
+      <div class="year-body">
+        <div class="year-display" id="year-display">2024</div>
+        <input type="range" class="year-slider" id="year-slider" min="2018" max="2026" value="2024" step="1" oninput="onYearChange(this.value)">
+        <div class="year-range">
+          <span>2018</span>
+          <span>2022</span>
+          <span>2026</span>
+        </div>
+        <div id="detection-status" style="text-align:center;font-size:11px;color:#888;margin-top:6px;"></div>
+        <label class="layer-toggle" style="margin-top:6px;">
+          <input type="checkbox" id="toggle-historical-basemap" onchange="toggleHistoricalBasemap()">
+          <span class="layer-color" style="background: linear-gradient(135deg, #2e7d32, #4caf50); border-radius:3px;"></span>
+          <span style="font-size:12px;">Historical Imagery</span>
+        </label>
+        <div class="opacity-control" id="basemap-opacity-control" style="display:none;">
+          <span>Blend</span>
+          <input type="range" id="opacity-basemap" min="0" max="100" value="70" oninput="setBasemapOpacity(this.value)">
+          <span id="opacity-basemap-val">70%</span>
+        </div>
+        <div id="basemap-status" style="text-align:center;font-size:10px;color:#888;margin-top:2px;"></div>
       </div>
     </div>
 
+    <div class="sidebar-section collapsed">
+      <h3 onclick="this.parentElement.classList.toggle('collapsed')">View & Tools</h3>
+      <div class="section-body">
+        <label class="layer-toggle">
+          <input type="checkbox" id="toggle-3d" onchange="toggle3D()">
+          <span style="font-size:14px;">🏔</span>
+          <span>3D Terrain</span>
+        </label>
+        <div class="opacity-control" id="exaggeration-control" style="display:none;">
+          <span>Height</span>
+          <input type="range" id="exaggeration-slider" min="1" max="5" value="2" step="0.5" oninput="setExaggeration(this.value)">
+          <span id="exaggeration-val">2x</span>
+        </div>
+        <label class="layer-toggle" style="margin-top:6px;">
+          <input type="checkbox" id="toggle-inspect" onchange="toggleInspectMode()">
+          <span style="font-size:14px;">⌖</span>
+          <span>Point Inspect</span>
+        </label>
+        <div class="inspect-note" id="inspect-status" style="font-size:10px;color:#999;padding-left:28px;">Click map to inspect</div>
+        <label class="layer-toggle" style="margin-top:6px;">
+          <input type="checkbox" id="toggle-ruler" onchange="toggleRuler()">
+          <span style="font-size:14px;">📏</span>
+          <span>Measure Distance</span>
+        </label>
+        <div class="ruler-result" id="ruler-result"></div>
+      </div>
+    </div>
+
+    <div class="sidebar-section collapsed">
+      <h3 onclick="this.parentElement.classList.toggle('collapsed')">Legend</h3>
+      <div class="section-body">
+        <div class="legend-item">
+          <div class="legend-dot" style="background: #af2a2a;"></div>
+          <span>Confirmed</span>
+          <span class="legend-tag tag-confirmed">MapBiomas</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background: #e6a817;"></div>
+          <span>Detected</span>
+          <span class="legend-tag tag-detected">Sentinel-2</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background: linear-gradient(to right, #FFF9C4, #FFD54F, #EF5350); border-radius:3px;"></div>
+          <span>AI Mining</span>
+          <span class="legend-tag" style="background:#FFF9C4;color:#C62828;" id="amw-legend-tag">AMW</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:3px;padding:2px 0 0 18px;font-size:9px;color:#999;">
+          <span style="width:14px;height:6px;background:#FFF9C4;border:1px solid #F9A825;border-radius:2px;display:inline-block;"></span>Old
+          <span style="width:14px;height:6px;background:#FFD54F;border:1px solid #F57F17;border-radius:2px;display:inline-block;"></span>
+          <span style="width:14px;height:6px;background:#EF5350;border:1px solid #C62828;border-radius:2px;display:inline-block;"></span>New
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background: linear-gradient(to right, #1a237e, #b71c1c); border-radius:3px;"></div>
+          <span>Timeline</span>
+          <span class="legend-tag" style="background:#f3e5f5;color:#4a148c;">2018–23</span>
+        </div>
+      </div>
+    </div>
+
     <div class="sidebar-section">
-      <h3>Import DMS Coordinates</h3>
-      <textarea id="dms-input" rows="8" placeholder="Paste DMS points, e.g.:
+      <h3 onclick="this.parentElement.classList.toggle('collapsed')">Go to Coordinates</h3>
+      <div class="section-body">
+        <div style="display:flex;gap:6px;">
+          <input type="text" id="coord-lat" placeholder="Lat" style="flex:1;padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;">
+          <input type="text" id="coord-lon" placeholder="Lon" style="flex:1;padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:12px;">
+        </div>
+        <button onclick="goToCoords()" style="width:100%;margin-top:5px;padding:6px;background:#1a1a2e;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;">Go</button>
+        <div id="coord-display" style="text-align:center;font-size:10px;color:#888;margin-top:4px;"></div>
+      </div>
+    </div>
+
+    <div class="sidebar-section collapsed">
+      <h3 onclick="this.parentElement.classList.toggle('collapsed')">Saved Locations</h3>
+      <div class="section-body">
+        <div class="saved-list" id="saved-list">
+          <div class="saved-empty">No saved locations yet</div>
+        </div>
+        <div class="saved-actions">
+          <button class="btn-download" onclick="downloadSaved()">Download</button>
+          <button class="btn-clear-saved" onclick="clearAllSaved()">Clear All</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-section collapsed">
+      <h3 onclick="this.parentElement.classList.toggle('collapsed')">Import DMS</h3>
+      <div class="section-body">
+        <textarea id="dms-input" rows="5" placeholder="Paste DMS points, e.g.:
 A. 5° 9' 41.42&quot;
 B. 5° 9' 41.13&quot;
-C. 5° 8' 31.35&quot;
-D. 5° 8' 32.44&quot;
 55° 26' 28.40&quot; W
-55° 26' 1.01&quot; W
-55° 25' 59.88&quot; W
-55° 26' 28.28&quot; W
-
-Suriname mode:
-- 5°... is treated as latitude
-- 55°... is treated as longitude" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:11px;font-family:monospace;resize:vertical;box-sizing:border-box;"></textarea>
-      <input type="text" id="dms-name" class="form-input" placeholder="Area name (e.g. Renarte block A)">
-      <input type="text" id="dms-note" class="form-input" placeholder="Note / remark">
-      <button onclick="importDMS()" style="width:100%;margin-top:6px;padding:7px;background:#1a1a2e;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;">Import & Plot</button>
-      <button onclick="saveCurrentPlot()" style="width:100%;margin-top:4px;padding:7px;background:#e6a817;color:#1a1a2e;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">Save Area</button>
-      <button onclick="clearPlot()" style="width:100%;margin-top:4px;padding:5px;background:transparent;color:#888;border:1px solid #ddd;border-radius:6px;font-size:11px;cursor:pointer;">Clear Plot</button>
-      <div id="dms-status" style="text-align:center;font-size:11px;color:#888;margin-top:6px;"></div>
-    </div>
-
-    <div class="sidebar-section">
-      <h3>Saved Areas</h3>
-      <div class="saved-plots-list" id="saved-plots-list">
-        <div class="saved-empty">No saved areas yet</div>
-      </div>
-      <div class="saved-actions">
-        <button class="btn-download" onclick="downloadSavedPlots()">Download</button>
-        <button class="btn-clear-saved" onclick="clearAllSavedPlots()">Clear All</button>
+55° 26' 1.01&quot; W" style="width:100%;padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:10px;font-family:monospace;resize:vertical;box-sizing:border-box;"></textarea>
+        <input type="text" id="dms-name" class="form-input" placeholder="Area name">
+        <input type="text" id="dms-note" class="form-input" placeholder="Note">
+        <button onclick="importDMS()" style="width:100%;margin-top:5px;padding:6px;background:#1a1a2e;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;">Import & Plot</button>
+        <button onclick="saveCurrentPlot()" style="width:100%;margin-top:3px;padding:6px;background:#e6a817;color:#1a1a2e;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Save Area</button>
+        <button onclick="clearPlot()" style="width:100%;margin-top:3px;padding:4px;background:transparent;color:#888;border:1px solid #ddd;border-radius:6px;font-size:10px;cursor:pointer;">Clear Plot</button>
+        <div id="dms-status" style="text-align:center;font-size:10px;color:#888;margin-top:4px;"></div>
       </div>
     </div>
 
-    <div class="sidebar-section">
-      <h3>Import Drill Holes (UTM)</h3>
-      <textarea id="utm-input" rows="6" placeholder="Paste table data, e.g.:
-SPDD-001  Bob  672975  569515  -23.1  162.0
-SPDD-002  Bob  672997  569499  -22.8  150.0
-(Hole ID, Target, Easting, Northing, Elev, EOH)" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:6px;font-size:11px;font-family:monospace;resize:vertical;box-sizing:border-box;"></textarea>
-      <div style="display:flex;gap:6px;margin-top:6px;">
-        <label style="font-size:11px;color:#666;display:flex;align-items:center;gap:4px;">
-          UTM Zone:
-          <input type="number" id="utm-zone" value="21" min="1" max="60" style="width:42px;padding:4px;border:1px solid #ddd;border-radius:4px;font-size:12px;">
-        </label>
-        <label style="font-size:11px;color:#666;display:flex;align-items:center;gap:4px;">
-          <input type="checkbox" id="utm-north" checked> North
-        </label>
+    <div class="sidebar-section collapsed">
+      <h3 onclick="this.parentElement.classList.toggle('collapsed')">Saved Areas</h3>
+      <div class="section-body">
+        <div class="saved-plots-list" id="saved-plots-list">
+          <div class="saved-empty">No saved areas yet</div>
+        </div>
+        <div class="saved-actions">
+          <button class="btn-download" onclick="downloadSavedPlots()">Download</button>
+          <button class="btn-clear-saved" onclick="clearAllSavedPlots()">Clear All</button>
+        </div>
       </div>
-      <button onclick="importUTM()" style="width:100%;margin-top:6px;padding:7px;background:#1a1a2e;color:#fff;border:none;border-radius:6px;font-size:13px;cursor:pointer;">Import & Plot</button>
-      <button onclick="clearDrillHoles()" style="width:100%;margin-top:4px;padding:5px;background:transparent;color:#888;border:1px solid #ddd;border-radius:6px;font-size:11px;cursor:pointer;">Clear Drill Holes</button>
-      <div id="utm-status" style="text-align:center;font-size:11px;color:#888;margin-top:6px;"></div>
     </div>
+
+    <div class="sidebar-section collapsed">
+      <h3 onclick="this.parentElement.classList.toggle('collapsed')">Import UTM Drill Holes</h3>
+      <div class="section-body">
+        <textarea id="utm-input" rows="4" placeholder="Hole ID  Target  Easting  Northing  Elev  EOH
+SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;border:1px solid #ddd;border-radius:6px;font-size:10px;font-family:monospace;resize:vertical;box-sizing:border-box;"></textarea>
+        <div style="display:flex;gap:6px;margin-top:5px;">
+          <label style="font-size:10px;color:#666;display:flex;align-items:center;gap:3px;">
+            Zone:
+            <input type="number" id="utm-zone" value="21" min="1" max="60" style="width:38px;padding:3px;border:1px solid #ddd;border-radius:4px;font-size:11px;">
+          </label>
+          <label style="font-size:10px;color:#666;display:flex;align-items:center;gap:3px;">
+            <input type="checkbox" id="utm-north" checked> North
+          </label>
+        </div>
+        <button onclick="importUTM()" style="width:100%;margin-top:5px;padding:6px;background:#1a1a2e;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;">Import & Plot</button>
+        <button onclick="clearDrillHoles()" style="width:100%;margin-top:3px;padding:4px;background:transparent;color:#888;border:1px solid #ddd;border-radius:6px;font-size:10px;cursor:pointer;">Clear</button>
+        <div id="utm-status" style="text-align:center;font-size:10px;color:#888;margin-top:4px;"></div>
+      </div>
+    </div>
+
+    </div><!-- /sidebar-body -->
   </div>
 
   <div class="loading-overlay" id="loading">Loading tiles...</div>
