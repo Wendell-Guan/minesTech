@@ -1107,11 +1107,13 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
       });
 
       const opacity = parseInt(document.getElementById('opacity-detected').value) / 100;
+      const visible = document.getElementById('toggle-detected').checked;
       map.addLayer({
         id: 'detected-mining-layer',
         type: 'raster',
         source: 'detected-mining',
         maxzoom: 14,
+        layout: { visibility: visible ? 'visible' : 'none' },
         paint: { 'raster-opacity': opacity }
       });
     }
@@ -1301,14 +1303,17 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
       updateAMWStatus(totalFeatures);
 
       // Sync the detection year slider if the AMW period maps to a year
-      const yearMatch = amwPeriod.match(/^(\d{4})/);
-      if (yearMatch) {
-        const yr = parseInt(yearMatch[1]);
-        const slider = document.getElementById('year-slider');
-        const minYr = parseInt(slider.min), maxYr = parseInt(slider.max);
-        if (yr >= minYr && yr <= maxYr && parseInt(slider.value) !== yr) {
-          slider.value = yr;
-          onYearChange(yr, true);
+      // Skip during time-lapse to avoid reloading detection layers
+      if (!tlPlaying) {
+        const yearMatch = amwPeriod.match(/^(\d{4})/);
+        if (yearMatch) {
+          const yr = parseInt(yearMatch[1]);
+          const slider = document.getElementById('year-slider');
+          const minYr = parseInt(slider.min), maxYr = parseInt(slider.max);
+          if (yr >= minYr && yr <= maxYr && parseInt(slider.value) !== yr) {
+            slider.value = yr;
+            onYearChange(yr, true);
+          }
         }
       }
     }
@@ -2760,13 +2765,18 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
         renderAMWPeriodButtons();
         await updateAMWLayerVisibility();
       } else {
-        // Satellite mode: load historical basemap for the year
+        // Satellite mode: apply cached basemap directly (preloaded in playTL)
         const yearMatch = period.match(/^(\d{4})/);
         if (yearMatch) {
+          const yr = parseInt(yearMatch[1]);
           document.getElementById('toggle-historical-basemap').checked = true;
           const opCtrl = document.getElementById('basemap-opacity-control');
           if (opCtrl) opCtrl.style.display = '';
-          await loadHistoricalBasemap(parseInt(yearMatch[1]));
+          if (basemapCache[yr]) {
+            applyBasemapTiles(basemapCache[yr], yr);
+          } else {
+            await loadHistoricalBasemap(yr);
+          }
         }
       }
     }
@@ -2779,14 +2789,41 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
       }
     }
 
-    function playTL() {
+    async function playTL() {
+      // In satellite mode, preload all year tile URLs before starting playback
+      if (tlMode === 'satellite') {
+        const years = [...new Set(TL_STEPS.map(s => parseInt(s.match(/^(\d{4})/)[1])))];
+        const toPreload = years.filter(y => !basemapCache[y]);
+
+        if (toPreload.length > 0) {
+          document.getElementById('tl-play').textContent = '⏳';
+          document.getElementById('tl-year').textContent = `Preloading 0/${toPreload.length}...`;
+
+          let loaded = 0;
+          for (const yr of toPreload) {
+            const urls = IS_LOCAL
+              ? [`${window.location.origin}/api/basemap/${yr}`, `http://localhost:5001/api/basemap/${yr}`]
+              : [`/api/basemap/${yr}`];
+            for (const url of urls) {
+              try {
+                const resp = await fetch(url);
+                if (!resp.ok) continue;
+                const data = await resp.json();
+                if (data.url) { basemapCache[yr] = data.url; break; }
+              } catch (e) { /* try next */ }
+            }
+            loaded++;
+            document.getElementById('tl-year').textContent = `Preloading ${loaded}/${toPreload.length}...`;
+          }
+        }
+      }
+
       tlPlaying = true;
       document.getElementById('tl-play').textContent = '⏸';
 
       function step() {
         if (!tlPlaying) return;
         if (tlIndex >= TL_STEPS.length - 1) {
-          // Loop back
           tlIndex = -1;
         }
         showTLFrame(tlIndex + 1);
