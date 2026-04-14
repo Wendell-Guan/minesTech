@@ -2765,18 +2765,34 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
         renderAMWPeriodButtons();
         await updateAMWLayerVisibility();
       } else {
-        // Satellite mode: apply cached basemap directly (preloaded in playTL)
+        // Satellite mode: hide AMW layers, show historical basemap only
+        AMW_ALL_PERIODS.forEach(p => {
+          const ids = amwLayerIds(p);
+          if (amwLayersCreated.has(p)) {
+            map.setLayoutProperty(ids.fill, 'visibility', 'none');
+            map.setLayoutProperty(ids.outline, 'visibility', 'none');
+          }
+        });
+
+        // Apply cached basemap directly (preloaded in playTL)
         const yearMatch = period.match(/^(\d{4})/);
         if (yearMatch) {
           const yr = parseInt(yearMatch[1]);
           document.getElementById('toggle-historical-basemap').checked = true;
           const opCtrl = document.getElementById('basemap-opacity-control');
           if (opCtrl) opCtrl.style.display = '';
+          // Set full opacity for satellite timelapse
+          if (map.getLayer('historical-basemap-layer')) {
+            map.setPaintProperty('historical-basemap-layer', 'raster-opacity', 1);
+          }
           if (basemapCache[yr]) {
             applyBasemapTiles(basemapCache[yr], yr);
+            // Force full opacity on the new layer too
+            map.setPaintProperty('historical-basemap-layer', 'raster-opacity', 1);
           } else {
             await loadHistoricalBasemap(yr);
           }
+          document.getElementById('basemap-status').textContent = `Sentinel-2 ${yr}`;
         }
       }
     }
@@ -2849,6 +2865,8 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
         tlBoxLayer = false;
       }
       map.getCanvas().style.cursor = '';
+      // Restore normal AMW layer visibility
+      updateAMWLayerVisibility();
     }
 
     function seekTL(e) {
