@@ -470,6 +470,20 @@
           <span>Mining Timeline</span>
         </label>
         <div class="opacity-control"><input type="range" id="opacity-timeline" min="0" max="100" value="80" oninput="setTimelineOpacity(this.value)" style="flex:1;"><span id="opacity-timeline-val" style="min-width:28px;text-align:right;">80%</span></div>
+
+        <label class="layer-toggle" style="margin-top:8px;">
+          <input type="checkbox" id="toggle-terrain-view" onchange="toggleTerrainView()">
+          <span class="layer-color" style="background: linear-gradient(135deg, #5d4037, #8d6e63, #a1887f); border-radius:3px;"></span>
+          <span>Terrain View</span>
+        </label>
+        <div id="terrain-view-controls" style="display:none;padding-left:28px;">
+          <div style="display:flex;gap:4px;margin-bottom:4px;">
+            <button class="amw-mode-btn active" id="tv-mode-hybrid" onclick="setTerrainViewMode('hybrid')" style="flex:1;font-size:10px;padding:3px 6px;">Hybrid</button>
+            <button class="amw-mode-btn" id="tv-mode-terrain" onclick="setTerrainViewMode('terrain')" style="flex:1;font-size:10px;padding:3px 6px;">Terrain Only</button>
+          </div>
+          <div class="opacity-control"><span style="font-size:10px;">Relief</span><input type="range" id="hillshade-intensity" min="0" max="100" value="50" oninput="setHillshadeIntensity(this.value)" style="flex:1;"><span id="hillshade-intensity-val" style="min-width:28px;text-align:right;font-size:10px;">50%</span></div>
+          <div class="opacity-control"><span style="font-size:10px;">Exaggeration</span><input type="range" id="hillshade-exaggeration" min="1" max="8" value="3" step="0.5" oninput="setHillshadeExaggeration(this.value)" style="flex:1;"><span id="hillshade-exaggeration-val" style="min-width:28px;text-align:right;font-size:10px;">3x</span></div>
+        </div>
       </div>
     </div>
 
@@ -1712,6 +1726,128 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
 
     function setExaggeration(val) {
       document.getElementById('exaggeration-val').textContent = val + 'x';
+      if (is3D) {
+        map.setTerrain({ source: 'terrain-dem', exaggeration: parseFloat(val) });
+      }
+    }
+
+    // ── Terrain View (Hillshade + Elevation Colors) ──
+
+    let terrainViewActive = false;
+    let terrainViewMode = 'hybrid'; // 'hybrid' or 'terrain'
+
+    function toggleTerrainView() {
+      terrainViewActive = document.getElementById('toggle-terrain-view').checked;
+      document.getElementById('terrain-view-controls').style.display = terrainViewActive ? 'block' : 'none';
+
+      if (terrainViewActive) {
+        addTerrainViewLayers();
+        // Auto-enable 3D terrain for full effect
+        if (!is3D) {
+          document.getElementById('toggle-3d').checked = true;
+          toggle3D();
+        }
+      } else {
+        removeTerrainViewLayers();
+      }
+    }
+
+    function addTerrainViewLayers() {
+      // 1) Hillshade layer — creates shaded relief from DEM
+      if (!map.getLayer('hillshade-layer')) {
+        map.addLayer({
+          id: 'hillshade-layer',
+          type: 'hillshade',
+          source: 'terrain-dem',
+          paint: {
+            'hillshade-illumination-direction': 315,
+            'hillshade-illumination-anchor': 'viewport',
+            'hillshade-exaggeration': parseFloat(document.getElementById('hillshade-exaggeration').value) / 4,
+            'hillshade-shadow-color': '#1a1a2e',
+            'hillshade-highlight-color': '#ffffff',
+            'hillshade-accent-color': '#5d4037'
+          }
+        }, 'satellite-layer'); // Below satellite so it blends underneath
+      }
+
+      // 2) Elevation color layer — green lowlands to brown highlands
+      // We use a raster-dem layer with color mapping via a second hillshade with accent colors
+      if (!map.getLayer('elevation-tint')) {
+        map.addLayer({
+          id: 'elevation-tint',
+          type: 'hillshade',
+          source: 'terrain-dem',
+          paint: {
+            'hillshade-illumination-direction': 0,
+            'hillshade-exaggeration': 0.01,
+            'hillshade-shadow-color': '#2e7d32',   // low areas = green (forest)
+            'hillshade-highlight-color': '#8d6e63', // high areas = brown (mountains)
+            'hillshade-accent-color': '#d7ccc8'     // mid-tone
+          }
+        }, 'satellite-layer');
+      }
+
+      applyTerrainViewMode();
+    }
+
+    function removeTerrainViewLayers() {
+      if (map.getLayer('hillshade-layer')) map.removeLayer('hillshade-layer');
+      if (map.getLayer('elevation-tint')) map.removeLayer('elevation-tint');
+      // Restore satellite opacity
+      if (map.getLayer('satellite-layer')) {
+        map.setPaintProperty('satellite-layer', 'raster-opacity', 1);
+      }
+    }
+
+    function applyTerrainViewMode() {
+      if (!terrainViewActive) return;
+      const intensity = parseInt(document.getElementById('hillshade-intensity').value) / 100;
+
+      if (terrainViewMode === 'terrain') {
+        // Terrain Only: dim satellite, emphasize hillshade
+        if (map.getLayer('satellite-layer')) {
+          map.setPaintProperty('satellite-layer', 'raster-opacity', 0.25);
+        }
+        if (map.getLayer('hillshade-layer')) {
+          map.setPaintProperty('hillshade-layer', 'hillshade-exaggeration', intensity * 0.8);
+        }
+        if (map.getLayer('elevation-tint')) {
+          map.setLayoutProperty('elevation-tint', 'visibility', 'visible');
+          map.setPaintProperty('elevation-tint', 'hillshade-exaggeration', 0.3);
+        }
+      } else {
+        // Hybrid: satellite + hillshade overlay
+        if (map.getLayer('satellite-layer')) {
+          map.setPaintProperty('satellite-layer', 'raster-opacity', 1);
+        }
+        if (map.getLayer('hillshade-layer')) {
+          map.setPaintProperty('hillshade-layer', 'hillshade-exaggeration', intensity * 0.5);
+        }
+        if (map.getLayer('elevation-tint')) {
+          map.setLayoutProperty('elevation-tint', 'visibility', 'none');
+        }
+      }
+    }
+
+    function setTerrainViewMode(mode) {
+      terrainViewMode = mode;
+      document.getElementById('tv-mode-hybrid').classList.toggle('active', mode === 'hybrid');
+      document.getElementById('tv-mode-terrain').classList.toggle('active', mode === 'terrain');
+      applyTerrainViewMode();
+    }
+
+    function setHillshadeIntensity(val) {
+      document.getElementById('hillshade-intensity-val').textContent = val + '%';
+      applyTerrainViewMode();
+    }
+
+    function setHillshadeExaggeration(val) {
+      document.getElementById('hillshade-exaggeration-val').textContent = val + 'x';
+      if (map.getLayer('hillshade-layer')) {
+        const intensity = parseInt(document.getElementById('hillshade-intensity').value) / 100;
+        map.setPaintProperty('hillshade-layer', 'hillshade-exaggeration', intensity * parseFloat(val) / 4);
+      }
+      // Also update 3D terrain exaggeration for full effect
       if (is3D) {
         map.setTerrain({ source: 'terrain-dem', exaggeration: parseFloat(val) });
       }
