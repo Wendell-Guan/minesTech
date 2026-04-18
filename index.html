@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Suriname Mining Monitor</title>
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css">
   <style>
@@ -406,7 +409,10 @@
       font-size: 10px; color: #999; z-index: 10;
     }
 
-    /* Mobile toggle button */
+    /* Sidebar close button — hidden by default (desktop); shown only on mobile legacy path */
+    .sidebar-close { display: none; }
+
+    /* Mobile toggle button (desktop-hidden fallback) */
     .sidebar-toggle {
       display: none; position: absolute; top: 12px; left: 12px;
       width: 40px; height: 40px; background: #1a1a2e; color: #fff;
@@ -414,28 +420,463 @@
       z-index: 11; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
 
-    /* Mobile responsive */
-    @media (max-width: 600px) {
-      .sidebar {
-        top: 0; left: 0; width: 100%; height: auto; max-height: 70vh;
-        border-radius: 0 0 14px 14px; overflow-y: auto;
-        transform: translateY(-100%); transition: transform 0.3s ease;
+    /* ═══════════════════════════════════════════════════════════
+       MOBILE CSS — Google Maps / iOS Maps style redesign
+       Active only at ≤768px wide (or ≤950×500 for landscape phones).
+       Desktop > 768px is completely untouched.
+       ═══════════════════════════════════════════════════════════ */
+    @media (max-width: 768px),
+           (max-width: 950px) and (max-height: 500px) {
+      :root {
+        --m-blue: #007aff;
+        --m-red: #ff3b30;
+        --m-green: #34c759;
+        --m-bg-elev: rgba(255,255,255,0.94);
+        --m-bg-elev-solid: #f5f5f7;
+        --m-fill: rgba(120,120,128,0.14);
+        --m-fill-strong: rgba(120,120,128,0.22);
+        --m-sep: rgba(60,60,67,0.12);
+        --m-label: #1c1c1e;
+        --m-label2: #3c3c43;
+        --m-label3: rgba(60,60,67,0.6);
+        --m-radius: 14px;
+        --m-radius-lg: 20px;
+        --m-tap: 44px;
+        --m-peek-h: 132px;
+        --sat: env(safe-area-inset-top);
+        --sab: env(safe-area-inset-bottom);
       }
-      .sidebar.open { transform: translateY(0); }
-      .sidebar-toggle { display: flex; align-items: center; justify-content: center; }
-      .sidebar.open ~ .sidebar-toggle { display: none; }
-      .sidebar-header { position: sticky; top: 0; z-index: 2; }
-      .sidebar-close {
-        display: block !important; margin-left: auto;
-        background: none; border: none; color: #fff; font-size: 22px; cursor: pointer;
+      html { -webkit-text-size-adjust: 100%; }
+
+      /* App root */
+      .m-app {
+        position: fixed; inset: 0;
+        pointer-events: none;
+        z-index: 9;
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif;
       }
-      .info-badge {
-        bottom: 10px; left: 50%; transform: translateX(-50%); white-space: nowrap;
+      .m-app > * { pointer-events: auto; }
+
+      /* Right-side nav bar */
+      .m-nav {
+        position: fixed;
+        top: calc(var(--sat) + 12px); right: 12px;
+        display: flex; flex-direction: column; gap: 8px;
+        z-index: 12;
       }
+      .m-btn {
+        width: 44px; height: 44px;
+        border: 0.5px solid rgba(0,0,0,0.06);
+        border-radius: 12px;
+        background: var(--m-bg-elev);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        backdrop-filter: blur(20px) saturate(180%);
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+        font-size: 20px; color: var(--m-blue);
+        display: flex; align-items: center; justify-content: center;
+        cursor: pointer; padding: 0;
+        transition: transform 0.1s;
+      }
+      .m-btn:active { transform: scale(0.92); }
+      .m-btn.on { background: var(--m-blue); color: #fff; border-color: var(--m-blue); }
+      .m-btn[hidden] { display: none !important; }
+      .m-btn .m-btn-lbl { font-size: 11px; font-weight: 700; letter-spacing: -0.3px; }
+
+      /* Bottom peek */
+      .m-peek {
+        position: fixed;
+        left: 8px; right: 8px;
+        bottom: calc(var(--sab) + 8px);
+        background: var(--m-bg-elev);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        backdrop-filter: blur(24px) saturate(180%);
+        border: 0.5px solid rgba(0,0,0,0.05);
+        border-radius: var(--m-radius);
+        box-shadow: 0 6px 22px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.06);
+        padding: 10px 12px 12px;
+        z-index: 10;
+      }
+      .m-searchbar {
+        display: flex; align-items: center; gap: 8px;
+        height: 40px;
+        background: var(--m-fill);
+        border-radius: 10px;
+        padding: 0 12px;
+        color: var(--m-label3); font-size: 15px;
+        cursor: pointer;
+      }
+      .m-searchbar-ic { font-size: 14px; opacity: 0.6; }
+      .m-searchbar-txt { flex: 1; }
+
+      .m-yearbar {
+        display: flex; align-items: center; gap: 10px;
+        margin-top: 10px; padding: 0 2px;
+      }
+      .m-yearbar-yr {
+        min-width: 48px;
+        font-size: 17px; font-weight: 700;
+        color: var(--m-label); letter-spacing: -0.5px;
+        font-variant-numeric: tabular-nums;
+      }
+      .m-yearbar-slider {
+        -webkit-appearance: none; appearance: none;
+        flex: 1; height: 24px; background: transparent;
+      }
+      .m-yearbar-slider::-webkit-slider-runnable-track {
+        height: 4px; border-radius: 2px;
+        background: linear-gradient(to right, var(--m-blue) var(--yr-pct, 0%), rgba(120,120,128,0.2) var(--yr-pct, 0%));
+      }
+      .m-yearbar-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 24px; height: 24px; border-radius: 50%;
+        background: #fff; margin-top: -10px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.25), 0 3px 8px rgba(0,0,0,0.12);
+        border: none;
+      }
+
+      /* Sheet */
+      .m-sheet {
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,0);
+        z-index: 20;
+        display: flex; flex-direction: column; justify-content: flex-end;
+        pointer-events: none;
+        transition: background 0.3s;
+      }
+      .m-sheet.open {
+        pointer-events: auto;
+        background: rgba(0,0,0,0.2);
+      }
+      .m-sheet-card {
+        background: var(--m-bg-elev-solid);
+        border-radius: var(--m-radius-lg) var(--m-radius-lg) 0 0;
+        max-height: 92vh; height: 92vh;
+        transform: translateY(100%);
+        transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+        display: flex; flex-direction: column;
+        overflow: hidden;
+        box-shadow: 0 -8px 40px rgba(0,0,0,0.18);
+      }
+      .m-sheet.open .m-sheet-card { transform: translateY(0); }
+      .m-sheet-grabber {
+        width: 36px; height: 5px; border-radius: 3px;
+        background: rgba(60,60,67,0.3);
+        margin: 8px auto 4px;
+        flex-shrink: 0;
+      }
+      .m-sheet-topbar {
+        display: flex; align-items: center;
+        padding: 4px 6px 10px;
+        flex-shrink: 0;
+      }
+      .m-sheet-back, .m-sheet-close {
+        width: 36px; height: 36px;
+        border: none; background: transparent;
+        font-size: 22px; color: var(--m-blue);
+        cursor: pointer; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .m-sheet-back:active, .m-sheet-close:active { background: var(--m-fill); }
+      .m-sheet-back[hidden] { visibility: hidden; }
+      .m-sheet-title {
+        flex: 1; text-align: center;
+        font-size: 17px; font-weight: 600;
+        color: var(--m-label);
+      }
+      .m-sheet-body {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 4px 16px calc(var(--sab) + 24px);
+      }
+
+      /* Content primitives inside sheets */
+      .m-section {
+        margin: 18px 0 8px;
+        font-size: 13px; font-weight: 600;
+        color: var(--m-label3);
+        text-transform: uppercase; letter-spacing: 0.4px;
+        padding: 0 4px;
+      }
+      .m-group {
+        background: #fff;
+        border-radius: var(--m-radius);
+        overflow: hidden;
+        border: 0.5px solid var(--m-sep);
+      }
+      .m-row {
+        display: flex; align-items: center;
+        min-height: 52px;
+        padding: 10px 14px; gap: 12px;
+        border-bottom: 0.5px solid var(--m-sep);
+        background: #fff;
+        cursor: pointer;
+      }
+      .m-row:last-child { border-bottom: none; }
+      .m-row:active { background: var(--m-fill); }
+      .m-row-ic {
+        width: 28px; height: 28px; border-radius: 6px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 15px; flex-shrink: 0;
+      }
+      .m-row-lbl { flex: 1; font-size: 16px; color: var(--m-label); }
+      .m-row-sub { font-size: 13px; color: var(--m-label3); margin-top: 2px; }
+      .m-row-chev { color: var(--m-label3); font-size: 18px; margin-left: 4px; }
+
+      /* iOS toggle */
+      .m-toggle {
+        appearance: none; -webkit-appearance: none;
+        width: 51px; height: 31px; border-radius: 31px;
+        background: rgba(120,120,128,0.16);
+        position: relative; cursor: pointer; flex-shrink: 0;
+        transition: background 0.25s;
+      }
+      .m-toggle::after {
+        content: '';
+        position: absolute; top: 2px; left: 2px;
+        width: 27px; height: 27px; border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 3px 8px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.06);
+        transition: left 0.25s;
+      }
+      .m-toggle:checked { background: var(--m-green); }
+      .m-toggle:checked::after { left: 22px; }
+
+      /* Map-type tiles */
+      .m-maptypes {
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+      }
+      .m-maptype {
+        border: 2px solid transparent;
+        border-radius: var(--m-radius);
+        background: var(--m-fill);
+        overflow: hidden;
+        cursor: pointer; padding: 0;
+        display: flex; flex-direction: column;
+      }
+      .m-maptype.active { border-color: var(--m-blue); }
+      .m-maptype-thumb {
+        aspect-ratio: 1 / 1;
+        background-size: cover; background-position: center;
+        background-color: #1a1a2e;
+      }
+      .m-maptype-lbl {
+        padding: 6px 4px 8px;
+        font-size: 12px; font-weight: 600;
+        color: var(--m-label);
+        text-align: center;
+      }
+      .m-maptype.active .m-maptype-lbl { color: var(--m-blue); }
+
+      /* Slider row */
+      .m-slider-row { padding: 14px; }
+      .m-slider-row .m-slider-lbl {
+        display: flex; justify-content: space-between;
+        font-size: 13px; color: var(--m-label3);
+        margin-bottom: 6px;
+      }
+      .m-slider-row .m-slider-val { color: var(--m-label); font-weight: 500; }
+      .m-slider-row input[type="range"] {
+        -webkit-appearance: none; appearance: none;
+        width: 100%; height: 24px; background: transparent;
+      }
+      .m-slider-row input[type="range"]::-webkit-slider-runnable-track {
+        height: 4px; border-radius: 2px;
+        background: rgba(120,120,128,0.2);
+      }
+      .m-slider-row input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 24px; height: 24px; border-radius: 50%;
+        background: #fff; margin-top: -10px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.25), 0 3px 8px rgba(0,0,0,0.12);
+      }
+
+      /* Segmented */
+      .m-seg {
+        display: flex;
+        background: var(--m-fill);
+        border-radius: 9px; padding: 2px;
+        margin: 12px 14px;
+      }
+      .m-seg-btn {
+        flex: 1; padding: 7px 8px;
+        font-size: 13px; font-weight: 500;
+        background: transparent; border: none; border-radius: 7px;
+        color: var(--m-label); cursor: pointer;
+      }
+      .m-seg-btn.active {
+        background: #fff;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+      }
+
+      /* Chip list */
+      .m-chips {
+        display: flex; gap: 6px; flex-wrap: wrap;
+        padding: 8px 14px 14px;
+      }
+      .m-chips-scroll {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+      .m-chips-scroll::-webkit-scrollbar { display: none; }
+      .m-chip {
+        flex: 0 0 auto;
+        padding: 6px 12px;
+        font-size: 13px; font-weight: 500;
+        border: none; border-radius: 999px;
+        background: var(--m-fill); color: var(--m-label);
+        cursor: pointer; white-space: nowrap;
+      }
+      .m-chip.active { background: var(--m-blue); color: #fff; }
+
+      /* Inputs */
+      .m-input {
+        width: 100%; min-height: 44px;
+        padding: 10px 14px;
+        border: 1px solid var(--m-sep);
+        border-radius: 10px; background: #fff;
+        font-size: 16px; color: var(--m-label);
+        box-sizing: border-box;
+      }
+      .m-textarea {
+        width: 100%; min-height: 120px;
+        padding: 10px 14px;
+        border: 1px solid var(--m-sep);
+        border-radius: 10px; background: #fff;
+        font-size: 14px;
+        font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+        color: var(--m-label);
+        box-sizing: border-box; resize: vertical;
+      }
+      .m-primary-btn {
+        display: block; width: 100%; min-height: 48px;
+        background: var(--m-blue); color: #fff;
+        border: none; border-radius: 12px;
+        font-size: 16px; font-weight: 600;
+        cursor: pointer; margin-top: 10px;
+      }
+      .m-primary-btn:active { opacity: 0.85; }
+      .m-secondary-btn {
+        display: block; width: 100%; min-height: 44px;
+        background: var(--m-fill); color: var(--m-label);
+        border: none; border-radius: 10px;
+        font-size: 15px;
+        cursor: pointer; margin-top: 8px;
+      }
+      .m-danger-btn { color: var(--m-red) !important; }
+      .m-btn-row { display: flex; gap: 8px; margin-top: 10px; }
+      .m-btn-row > button { flex: 1; margin-top: 0; }
+
+      .m-empty {
+        padding: 28px 14px;
+        text-align: center;
+        color: var(--m-label3);
+        font-size: 14px;
+      }
+
+      .m-status {
+        padding: 8px 14px 12px;
+        font-size: 12px; color: var(--m-label3);
+        text-align: center;
+      }
+
+      /* Mode takeover */
+      .m-mode {
+        position: fixed; inset: 0;
+        pointer-events: none;
+        z-index: 15;
+        display: none;
+      }
+      .m-mode.show { display: block; }
+      .m-mode > * { pointer-events: auto; }
+      .m-mode-top {
+        position: absolute; top: 0; left: 0; right: 0;
+        padding: calc(var(--sat) + 8px) 10px 10px;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0));
+        display: flex; align-items: center; gap: 8px;
+        color: #fff;
+      }
+      .m-mode-x {
+        width: 40px; height: 40px;
+        border: none; background: rgba(0,0,0,0.55);
+        -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+        color: #fff; font-size: 18px; border-radius: 50%; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .m-mode-ttl {
+        flex: 1; font-size: 16px; font-weight: 600;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+      }
+      .m-mode-act {
+        padding: 8px 14px;
+        background: rgba(0,0,0,0.55);
+        -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+        color: #fff; border: none; border-radius: 20px;
+        font-size: 14px; font-weight: 500; cursor: pointer;
+      }
+      .m-mode-bot {
+        position: absolute; left: 10px; right: 10px;
+        bottom: calc(var(--sab) + 10px);
+        background: var(--m-bg-elev);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        backdrop-filter: blur(24px) saturate(180%);
+        border: 0.5px solid rgba(0,0,0,0.05);
+        border-radius: var(--m-radius);
+        padding: 12px 14px;
+        box-shadow: 0 6px 22px rgba(0,0,0,0.14);
+      }
+      .m-mode-val {
+        font-size: 22px; font-weight: 700; color: var(--m-label);
+        letter-spacing: -0.5px;
+        font-variant-numeric: tabular-nums;
+        margin-bottom: 4px;
+      }
+      .m-mode-hint { font-size: 13px; color: var(--m-label3); }
+      .m-mode-bot .m-btn-row { margin-top: 10px; }
+
+      /* Place card */
+      .m-placecard {
+        position: fixed;
+        left: 8px; right: 8px;
+        bottom: calc(var(--sab) + 8px);
+        background: var(--m-bg-elev-solid);
+        border-radius: var(--m-radius-lg);
+        box-shadow: 0 -8px 40px rgba(0,0,0,0.2);
+        z-index: 14;
+        max-height: 60vh;
+        overflow-y: auto;
+        transform: translateY(calc(100% + 20px));
+        transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+        padding: 0 0 calc(var(--sab) + 8px);
+        display: none;
+      }
+      .m-placecard.show { display: block; }
+      .m-placecard.open { transform: translateY(0); }
+      .m-placecard-grabber {
+        width: 36px; height: 5px; border-radius: 3px;
+        background: rgba(60,60,67,0.3);
+        margin: 8px auto 8px;
+      }
+      .m-placecard-body { padding: 0 16px 8px; }
+
+      /* Desktop elements hidden on mobile */
+      .sidebar, .sidebar-toggle { display: none !important; }
+      .info-badge { display: none !important; }
+      .maplibregl-ctrl-top-right,
+      .maplibregl-ctrl-top-left { display: none !important; }
+      .maplibregl-ctrl-bottom-left,
+      .maplibregl-ctrl-bottom-right {
+        margin-bottom: calc(var(--m-peek-h) + var(--sab) + 4px) !important;
+      }
+
+      /* Show mobile app */
+      .m-app { display: block; }
     }
-    @media (min-width: 601px) {
-      .sidebar-close { display: none !important; }
-    }
+
+    /* Desktop default */
+    .m-app { display: none; }
   </style>
 </head>
 <body>
@@ -443,6 +884,7 @@
   <div id="map-compare" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;display:none;z-index:1;"></div>
 
   <button class="sidebar-toggle" onclick="document.querySelector('.sidebar').classList.add('open')">☰</button>
+
   <div class="sidebar">
     <div class="sidebar-header">
       <div class="logo">⛏</div>
@@ -600,6 +1042,12 @@
           <span>Measure Area</span>
         </label>
         <div class="ruler-result" id="area-result"></div>
+        <label class="layer-toggle" style="margin-top:6px;">
+          <input type="checkbox" id="toggle-roads" onchange="toggleRoads()">
+          <span style="font-size:14px;">🛣</span>
+          <span>Roads</span>
+        </label>
+        <div class="inspect-note" id="roads-status" style="font-size:10px;color:#999;padding-left:28px;">Off. Enable Roads to load OSM highways for the current map view.</div>
         <div style="display:flex;gap:6px;margin-top:10px;">
           <button onclick="startTimelapse()" style="flex:1;padding:6px;background:#1a1a2e;color:#e6a817;border:1px solid #e6a817;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">🎬 Time-lapse</button>
           <button onclick="startSwipe()" style="flex:1;padding:6px;background:#1a1a2e;color:#2196F3;border:1px solid #2196F3;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;">↔ Swipe Compare</button>
@@ -679,6 +1127,10 @@ B. 5° 9' 41.13&quot;
         <input type="text" id="dms-name" class="form-input" placeholder="Area name">
         <input type="text" id="dms-note" class="form-input" placeholder="Note">
         <button onclick="importDMS()" style="width:100%;margin-top:5px;padding:6px;background:#1a1a2e;color:#fff;border:none;border-radius:6px;font-size:12px;cursor:pointer;">Import & Plot</button>
+        <div style="display:flex;gap:6px;margin-top:3px;">
+          <button onclick="normalizeCoordinateInput()" style="flex:1;padding:6px;background:#f6f6f6;color:#444;border:1px solid #ddd;border-radius:6px;font-size:11px;cursor:pointer;">Normalize</button>
+          <button onclick="copyCoordinateAIPrompt()" style="flex:1;padding:6px;background:#f6f6f6;color:#444;border:1px solid #ddd;border-radius:6px;font-size:11px;cursor:pointer;">Copy AI Prompt</button>
+        </div>
         <button onclick="saveCurrentPlot()" style="width:100%;margin-top:3px;padding:6px;background:#e6a817;color:#1a1a2e;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Save Area</button>
         <button onclick="clearPlot()" style="width:100%;margin-top:3px;padding:4px;background:transparent;color:#888;border:1px solid #ddd;border-radius:6px;font-size:10px;cursor:pointer;">Clear Plot</button>
         <div id="dms-status" style="text-align:center;font-size:10px;color:#888;margin-top:4px;"></div>
@@ -757,6 +1209,63 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
     Powered by minesTech
   </div>
 
+  <!-- ═════════════════════════════════════════════════════════════
+       MOBILE APP DOM — entire mobile UI lives under .m-app.
+       Hidden on desktop via CSS default. Independent from the
+       desktop sidebar (which still exists but is hidden on mobile).
+       ═════════════════════════════════════════════════════════════ -->
+  <div class="m-app">
+    <!-- Right-side floating nav bar (iPhone Maps style) -->
+    <nav class="m-nav" aria-label="Map controls">
+      <button class="m-btn" id="m-btn-layers"  aria-label="Layers">🗺</button>
+      <button class="m-btn" id="m-btn-locate"  aria-label="My location">◎</button>
+      <button class="m-btn" id="m-btn-3d"      aria-label="Toggle 3D"><span class="m-btn-lbl">3D</span></button>
+      <button class="m-btn" id="m-btn-compass" aria-label="Reset bearing" hidden>🧭</button>
+    </nav>
+
+    <!-- Bottom peek: search + year slider (always visible) -->
+    <div class="m-peek">
+      <div class="m-searchbar" id="m-searchbar" role="button" tabindex="0">
+        <span class="m-searchbar-ic">🔍</span>
+        <span class="m-searchbar-txt" id="m-searchbar-txt">Search a place…</span>
+      </div>
+      <div class="m-yearbar">
+        <span class="m-yearbar-yr" id="m-yearbar-yr">2025</span>
+        <input type="range" class="m-yearbar-slider" id="m-yearbar-slider"
+               min="2018" max="2026" step="1" value="2025">
+      </div>
+    </div>
+
+    <!-- Sheet (Layers / Search / sub-pages via stack nav) -->
+    <div class="m-sheet" id="m-sheet" role="dialog" aria-modal="true">
+      <div class="m-sheet-card">
+        <div class="m-sheet-grabber"></div>
+        <div class="m-sheet-topbar">
+          <button class="m-sheet-back" id="m-sheet-back" aria-label="Back" hidden>‹</button>
+          <div class="m-sheet-title" id="m-sheet-title">Layers</div>
+          <button class="m-sheet-close" id="m-sheet-close" aria-label="Close">✕</button>
+        </div>
+        <div class="m-sheet-body" id="m-sheet-body"></div>
+      </div>
+    </div>
+
+    <!-- Mode takeover (Ruler / Area / Time-lapse / Compare) -->
+    <div class="m-mode" id="m-mode">
+      <div class="m-mode-top">
+        <button class="m-mode-x" id="m-mode-x" aria-label="Exit mode">✕</button>
+        <div class="m-mode-ttl" id="m-mode-ttl">Mode</div>
+        <button class="m-mode-act" id="m-mode-act">Undo</button>
+      </div>
+      <div class="m-mode-bot" id="m-mode-bot"></div>
+    </div>
+
+    <!-- Place card (tap on map in inspect mode) -->
+    <div class="m-placecard" id="m-placecard">
+      <div class="m-placecard-grabber"></div>
+      <div class="m-placecard-body" id="m-placecard-body"></div>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <script>
     // Config
@@ -793,6 +1302,8 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
     let map;
     let debounceTimer;
     let inspectMode = false;
+    let roadsEnabled = false;
+    let roadsLoadedForBbox = null;
     window._currentPlotCoords = null;
     window._savedPlots = [];
     window._savedPlotMarkers = [];
@@ -1076,6 +1587,32 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
       return [...new Set(candidates)];
     }
 
+    function getRoadsApiUrls(south, west, north, east) {
+      const query = `south=${south}&west=${west}&north=${north}&east=${east}`;
+      if (!IS_LOCAL) return [`/api/roads?${query}`];
+      const candidates = [];
+      if (window.location.origin && window.location.origin !== 'null') {
+        candidates.push(`${window.location.origin}/api/roads?${query}`);
+      }
+      candidates.push(`http://localhost:5001/api/roads?${query}`, `http://127.0.0.1:5001/api/roads?${query}`);
+      return [...new Set(candidates)];
+    }
+
+    async function fetchRoadsGeoJSON(south, west, north, east) {
+      const urls = getRoadsApiUrls(south, west, north, east);
+      let lastError = null;
+      for (const url of urls) {
+        try {
+          const resp = await fetch(url);
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          return await resp.json();
+        } catch (err) {
+          lastError = err;
+        }
+      }
+      throw lastError || new Error('Road service unavailable');
+    }
+
     async function plotsApiRequest(method, body, idParam) {
       const urls = getPlotsApiUrls();
       for (const base of urls) {
@@ -1107,6 +1644,27 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
     }
     function writeLocalPlots(plots) {
       localStorage.setItem(SAVED_PLOTS_KEY, JSON.stringify(plots));
+    }
+
+    function getPlotCoordKey(coords) {
+      if (!Array.isArray(coords)) return '';
+      return coords.map(pair => {
+        if (!Array.isArray(pair) || pair.length < 2) return 'bad';
+        return `${Number(pair[0]).toFixed(6)},${Number(pair[1]).toFixed(6)}`;
+      }).join('|');
+    }
+
+    function mergePlots(primaryPlots, secondaryPlots) {
+      const merged = [];
+      const seen = new Set();
+      [...(primaryPlots || []), ...(secondaryPlots || [])].forEach(plot => {
+        if (!plot || !Array.isArray(plot.coords)) return;
+        const key = getPlotCoordKey(plot.coords);
+        if (!key || seen.has(key)) return;
+        seen.add(key);
+        merged.push(plot);
+      });
+      return merged;
     }
 
     function formatMetric(value, digits = 3) {
@@ -1207,6 +1765,7 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
       container: 'map',
       style: {
         version: 8,
+        glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
         sources: {
           'satellite': {
             ...getBasemapSourceConfig(currentBasemap)
@@ -1256,6 +1815,9 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
     }
     map.on('zoom', updateMarkerScales);
     map.on('moveend', updateHash);
+    map.on('moveend', () => {
+      if (roadsEnabled) loadRoadsForViewport();
+    });
 
     map.on('load', () => {
       updateBasemapUI();
@@ -1280,6 +1842,97 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
       loadSurinameBorder();
       loadSavedPlots();
     });
+
+    function normalizeRoadClass(highway) {
+      if (['motorway', 'trunk'].includes(highway)) return 'primary';
+      if (['primary', 'secondary'].includes(highway)) return 'secondary';
+      if (['tertiary', 'unclassified'].includes(highway)) return 'tertiary';
+      return 'track';
+    }
+
+    async function loadRoadsForViewport() {
+      const status = document.getElementById('roads-status');
+      if (!roadsEnabled || !map) return;
+
+      const bounds = map.getBounds();
+      const bbox = {
+        south: bounds.getSouth().toFixed(3),
+        west: bounds.getWest().toFixed(3),
+        north: bounds.getNorth().toFixed(3),
+        east: bounds.getEast().toFixed(3)
+      };
+      const bboxKey = `${bbox.south},${bbox.west},${bbox.north},${bbox.east}`;
+      if (bboxKey === roadsLoadedForBbox) return;
+
+      status.textContent = 'Loading roads for current view...';
+      status.style.color = '#777';
+
+      try {
+        const data = await fetchRoadsGeoJSON(bbox.south, bbox.west, bbox.north, bbox.east);
+        data.features = (data.features || []).map(feature => ({
+          ...feature,
+          properties: {
+            ...feature.properties,
+            road_class: normalizeRoadClass(feature.properties?.highway)
+          }
+        }));
+
+        if (map.getSource('roads-osm')) {
+          map.getSource('roads-osm').setData(data);
+        } else {
+          map.addSource('roads-osm', { type: 'geojson', data });
+          map.addLayer({
+            id: 'roads-osm-layer',
+            type: 'line',
+            source: 'roads-osm',
+            paint: {
+              'line-color': [
+                'match', ['get', 'road_class'],
+                'primary', '#f7f3a1',
+                'secondary', '#d6efff',
+                'tertiary', '#ffffff',
+                '#c49a6c'
+              ],
+              'line-width': [
+                'match', ['get', 'road_class'],
+                'primary', 2.2,
+                'secondary', 1.6,
+                'tertiary', 1.2,
+                0.9
+              ],
+              'line-opacity': 0.95
+            }
+          });
+        }
+
+        roadsLoadedForBbox = bboxKey;
+        status.textContent = `Loaded ${(data.features || []).length} roads from OpenStreetMap.`;
+        status.style.color = '#777';
+      } catch (err) {
+        console.error('Failed to load roads:', err);
+        status.textContent = 'Road loading failed. Check the local backend.';
+        status.style.color = '#af2a2a';
+      }
+    }
+
+    function toggleRoads() {
+      roadsEnabled = document.getElementById('toggle-roads').checked;
+      const status = document.getElementById('roads-status');
+
+      if (roadsEnabled) {
+        if (map.getLayer('roads-osm-layer')) {
+          map.setLayoutProperty('roads-osm-layer', 'visibility', 'visible');
+        }
+        roadsLoadedForBbox = null;
+        loadRoadsForViewport();
+      } else {
+        if (map.getLayer('roads-osm-layer')) {
+          map.setLayoutProperty('roads-osm-layer', 'visibility', 'none');
+        }
+        status.textContent = 'Off. Enable Roads to load OSM highways for the current map view.';
+        status.style.color = '#999';
+      }
+    }
 
     // ── Layer 1: Confirmed Mining (MapBiomas 2023, red, always on) ──
 
@@ -2208,21 +2861,55 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
     document.getElementById('coord-lon').addEventListener('keydown', e => { if (e.key === 'Enter') goToCoords(); });
 
     // ── DMS Import ──
-    function parseDMSLine(str) {
-      // Robust DMS parser for pasted field notes with noisy labels and mixed quote marks.
-      const cleaned = str
+    function cleanCoordinateText(str) {
+      return str
         .replace(/[“”]/g, '"')
         .replace(/[‘’]/g, "'")
         .replace(/º/g, '°')
         .replace(/\s+/g, ' ')
         .trim();
+    }
 
-      const m = cleaned.match(/(-?\d+(?:\.\d+)?)\s*[°]\s*(\d+(?:\.\d+)?)\s*['′]?\s*(\d+(?:\.\d+)?)\s*(?:["″']+)?/);
+    function isCoordinateHeader(line) {
+      const lower = line.toLowerCase();
+      return /(名称|name|lat|latitude|纬度|lon|lng|longitude|经度)/.test(lower);
+    }
+
+    function parseDecimalCoordinateValue(str, kindHint) {
+      const cleaned = cleanCoordinateText(str);
+      if (!cleaned || /[°]/.test(cleaned)) return null;
+
+      const m = cleaned.match(/-?\d+(?:\.\d+)?/);
+      if (!m) return null;
+
+      let value = parseFloat(m[0]);
+      const lower = cleaned.toLowerCase();
+      const hasWest = /\b(w|wl|w\.l\.?|west|westerlengte)\b/.test(lower);
+      const hasEast = /\b(e|east|oost)\b/.test(lower);
+      const hasNorth = /\b(n|n\.b\.?|north|noorderbreedte)\b/.test(lower);
+      const hasSouth = /\b(s|south|zuid)\b/.test(lower);
+      const kind = kindHint || (Math.abs(value) >= 15 ? 'lon' : 'lat');
+
+      if (kind === 'lon') {
+        if (hasEast) value = Math.abs(value);
+        else if (hasWest || value < 0) value = -Math.abs(value);
+        else value = -Math.abs(value);
+      } else {
+        if (hasSouth || value < 0) value = -Math.abs(value);
+        else value = Math.abs(value);
+      }
+
+      return value;
+    }
+
+    function parseDMSCoordinateValue(str, kindHint) {
+      const cleaned = cleanCoordinateText(str);
+      const m = cleaned.match(/(-?\d+(?:\.\d+)?)\s*[°]\s*(\d+(?:\.\d+)?)\s*['′]?\s*(\d+(?:\.\d+)?)?\s*(?:["″']+)?/);
       if (!m) return null;
 
       const degrees = parseFloat(m[1]);
       const minutes = parseFloat(m[2]);
-      const seconds = parseFloat(m[3]);
+      const seconds = parseFloat(m[3] || 0);
       let value = Math.abs(degrees) + minutes / 60 + seconds / 3600;
 
       const lower = cleaned.toLowerCase();
@@ -2231,25 +2918,196 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
       const hasNorth = /\b(n|n\.b\.?|north|noorderbreedte)\b/.test(lower);
       const hasSouth = /\b(s|south|zuid)\b/.test(lower);
 
-      let kind;
-      if (Math.abs(degrees) >= 15) {
-        kind = 'lon';
-      } else if (hasWest || hasEast) {
-        kind = 'lon';
-      } else if (hasNorth || hasSouth) {
-        kind = 'lat';
-      } else {
-        kind = 'lat';
+      let kind = kindHint;
+      if (!kind) {
+        if (Math.abs(degrees) >= 15 || hasWest || hasEast) kind = 'lon';
+        else if (hasNorth || hasSouth) kind = 'lat';
+        else kind = 'lat';
       }
 
       if (kind === 'lon') {
         if (hasEast) value = Math.abs(value);
-        else value = -value;
+        else value = -Math.abs(value);
       } else if (degrees < 0 || hasSouth) {
-        value = -value;
+        value = -Math.abs(value);
       }
 
-      return { kind, value, raw: cleaned };
+      return value;
+    }
+
+    function parseCoordinateValue(str, kindHint) {
+      return parseDMSCoordinateValue(str, kindHint) ?? parseDecimalCoordinateValue(str, kindHint);
+    }
+
+    function parseCoordinateLine(str) {
+      const cleaned = cleanCoordinateText(str);
+      if (!cleaned || isCoordinateHeader(cleaned)) return null;
+
+      const lower = cleaned.toLowerCase();
+      const hintedKind = /\b(lon|lng|longitude|经度|west|east|wl|w\.l\.?)\b/.test(lower)
+        ? 'lon'
+        : /\b(lat|latitude|纬度|north|south|nb|n\.b\.?)\b/.test(lower)
+          ? 'lat'
+          : null;
+
+      const value = parseCoordinateValue(cleaned, hintedKind);
+      if (value === null) return null;
+
+      return {
+        kind: hintedKind || (Math.abs(value) >= 15 ? 'lon' : 'lat'),
+        value,
+        raw: cleaned
+      };
+    }
+
+    function parseCoordinateRow(line) {
+      const cleaned = cleanCoordinateText(line);
+      if (!cleaned || isCoordinateHeader(cleaned)) return { ignore: true };
+
+      const byDelimiter = cleaned.split(/\s*[,;\t]\s*/).map(part => part.trim()).filter(Boolean);
+      if (byDelimiter.length >= 2) {
+        const lat = parseCoordinateValue(byDelimiter[byDelimiter.length - 2], 'lat');
+        const lon = parseCoordinateValue(byDelimiter[byDelimiter.length - 1], 'lon');
+        if (lat !== null && lon !== null) {
+          return { coord: [lon, lat] };
+        }
+      }
+
+      const pairMatch = cleaned.match(/(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/);
+      if (pairMatch) {
+        const lat = parseCoordinateValue(pairMatch[1], 'lat');
+        const lon = parseCoordinateValue(pairMatch[2], 'lon');
+        if (lat !== null && lon !== null) {
+          return { coord: [lon, lat] };
+        }
+      }
+
+      return null;
+    }
+
+    function toDmsString(value, kind) {
+      const abs = Math.abs(value);
+      const deg = Math.floor(abs);
+      const minFloat = (abs - deg) * 60;
+      const min = Math.floor(minFloat);
+      const sec = (minFloat - min) * 60;
+      const secText = sec.toFixed(2).replace(/\.?0+$/, '');
+      const dir = kind === 'lat'
+        ? (value >= 0 ? 'N' : 'S')
+        : (value >= 0 ? 'E' : 'W');
+      return `${deg}° ${min}' ${secText}" ${dir}`;
+    }
+
+    function formatCoordsForImport(coords) {
+      const lats = coords.map(([, lat]) => toDmsString(lat, 'lat'));
+      const lons = coords.map(([lon]) => toDmsString(lon, 'lon'));
+      return `${lats.join('\n')}\n\n${lons.join('\n')}`;
+    }
+
+    function parseCoordinateInput(raw) {
+      const lines = raw.split('\n').map(l => l.trim()).filter(l => l);
+      if (!lines.length) return { coords: [], mode: 'empty' };
+
+      const pairCoords = [];
+      let pairMode = true;
+      let sawMeaningfulLine = false;
+
+      for (const line of lines) {
+        const row = parseCoordinateRow(line);
+        if (row?.ignore) continue;
+        sawMeaningfulLine = true;
+        if (row?.coord) {
+          pairCoords.push(row.coord);
+          continue;
+        }
+        pairMode = false;
+        break;
+      }
+
+      if (pairMode && pairCoords.length) {
+        return { coords: pairCoords, mode: 'pairs' };
+      }
+
+      const lats = [];
+      const lons = [];
+      for (const line of lines) {
+        const parsed = parseCoordinateLine(line);
+        if (!parsed) continue;
+        if (parsed.kind === 'lat') lats.push(parsed.value);
+        else lons.push(parsed.value);
+      }
+
+      if (!sawMeaningfulLine && !lats.length && !lons.length) {
+        return { coords: [], mode: 'empty' };
+      }
+
+      if (!lats.length || !lons.length) {
+        return { coords: [], mode: 'unparsed' };
+      }
+
+      if (lats.length !== lons.length) {
+        return { coords: [], mode: 'mismatch', lats, lons };
+      }
+
+      return {
+        coords: lats.map((lat, i) => [lons[i], lat]),
+        mode: 'split'
+      };
+    }
+
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (err) {
+        const el = document.createElement('textarea');
+        el.value = text;
+        document.body.appendChild(el);
+        el.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(el);
+        return ok;
+      }
+    }
+
+    async function copyCoordinateAIPrompt() {
+      const input = document.getElementById('dms-input').value.trim();
+      const status = document.getElementById('dms-status');
+      if (!input) {
+        status.textContent = 'Paste raw coordinates first, then copy the AI prompt.';
+        status.style.color = '#af2a2a';
+        return;
+      }
+
+      const prompt = `Convert the following raw coordinates into minesTech Import DMS compatible text.\n\nRules:\n- Keep the original point order.\n- Output only latitudes first, one per line, in DMS with N/S.\n- Add one blank line.\n- Then output only longitudes, one per line, in DMS with E/W.\n- Remove headers, labels, commas, and any commentary.\n- If the input is decimal degrees, convert it to DMS.\n- Return only the final coordinate text, nothing else.\n\nRaw input:\n${input}`;
+      const ok = await copyText(prompt);
+      status.textContent = ok ? 'AI prompt copied. Paste it into AI together with your raw coordinates.' : 'Could not copy prompt automatically.';
+      status.style.color = ok ? '#4CAF50' : '#af2a2a';
+    }
+
+    function normalizeCoordinateInput() {
+      const raw = document.getElementById('dms-input').value.trim();
+      const status = document.getElementById('dms-status');
+      if (!raw) {
+        status.textContent = 'Paste raw coordinates first.';
+        status.style.color = '#af2a2a';
+        return;
+      }
+
+      const parsed = parseCoordinateInput(raw);
+      if (!parsed.coords.length) {
+        if (parsed.mode === 'mismatch') {
+          status.textContent = `Mismatch: found ${parsed.lats.length} latitudes and ${parsed.lons.length} longitudes`;
+        } else {
+          status.textContent = 'Could not normalize this format. Use Copy AI Prompt as fallback.';
+        }
+        status.style.color = '#af2a2a';
+        return;
+      }
+
+      document.getElementById('dms-input').value = formatCoordsForImport(parsed.coords);
+      status.textContent = `Normalized ${parsed.coords.length} coordinate${parsed.coords.length === 1 ? '' : 's'} into import format.`;
+      status.style.color = '#4CAF50';
     }
 
     function importDMS() {
@@ -2262,33 +3120,37 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
         return;
       }
 
-      const lines = raw.split('\n').map(l => l.trim()).filter(l => l);
-      const lats = [];
-      const lons = [];
-
-      for (const line of lines) {
-        const parsed = parseDMSLine(line);
-        if (!parsed) continue;
-        if (parsed.kind === 'lat') lats.push(parsed.value);
-        else lons.push(parsed.value);
-      }
-
-      if (lats.length === 0 || lons.length === 0) {
-        status.textContent = 'Could not parse coordinates. Paste DMS values like 5° 9\' 41.42" and 55° 26\' 28.40" W.';
+      const parsed = parseCoordinateInput(raw);
+      if (!parsed.coords.length) {
+        if (parsed.mode === 'mismatch') {
+          status.textContent = `Mismatch: found ${parsed.lats.length} latitudes and ${parsed.lons.length} longitudes`;
+        } else {
+          status.textContent = 'Could not parse coordinates. Use Normalize first, or Copy AI Prompt for unsupported formats.';
+        }
         status.style.color = '#af2a2a';
         return;
       }
 
-      if (lats.length !== lons.length) {
-        status.textContent = `Mismatch: found ${lats.length} latitudes and ${lons.length} longitudes`;
+      if (parsed.coords.length === 1) {
+        const [lon, lat] = parsed.coords[0];
+        document.getElementById('coord-lat').value = lat.toFixed(6);
+        document.getElementById('coord-lon').value = lon.toFixed(6);
+        goToCoords();
+        status.textContent = 'Parsed 1 point. Jumped to that location.';
+        status.style.color = '#4CAF50';
+        return;
+      }
+
+      if (parsed.coords.length < 3) {
+        status.textContent = 'At least 3 coordinate points are required to draw an area.';
         status.style.color = '#af2a2a';
         return;
       }
 
-      // Build coordinate pairs [lon, lat]
-      const coords = lats.map((lat, i) => [lons[i], lat]);
-      // Close the polygon
-      coords.push(coords[0]);
+      const coords = [...parsed.coords];
+      if (coords[0][0] !== coords[coords.length - 1][0] || coords[0][1] !== coords[coords.length - 1][1]) {
+        coords.push(coords[0]);
+      }
 
       // Remove previous plot
       clearPlot();
@@ -2340,7 +3202,7 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
         [Math.max(...allLons) + 0.005, Math.max(...allLats) + 0.005]
       ], { padding: 40, duration: 2000 });
 
-      status.textContent = `Plotted ${lats.length} points`;
+      status.textContent = `Plotted ${coords.length - 1} points`;
       status.style.color = '#4CAF50';
     }
 
@@ -2377,12 +3239,14 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
     }
 
     async function loadSavedPlots() {
+      const localData = getLocalPlots();
       const serverData = await plotsApiRequest('GET');
       if (serverData !== null) {
         _usePlotsServerAPI = true;
-        window._savedPlots = serverData;
+        window._savedPlots = mergePlots(serverData, localData);
+        writeLocalPlots(window._savedPlots);
       } else {
-        window._savedPlots = getLocalPlots();
+        window._savedPlots = localData;
       }
       renderSavedPlots();
     }
@@ -2402,24 +3266,29 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
       const colors = ['#e6a817', '#ef5350', '#42a5f5', '#26a69a', '#ab47bc', '#ffa726'];
       const color = colors[window._savedPlots.length % colors.length];
       const plotData = { name, note, color, coords: window._currentPlotCoords };
+      const localPlot = { ...plotData, id: `local-${Date.now()}`, savedAt: new Date().toISOString() };
+      window._savedPlots = mergePlots(window._savedPlots, [localPlot]);
+      writeLocalPlots(window._savedPlots);
+      renderSavedPlots();
 
+      let savedMessage = `Saved area locally: ${name}`;
       if (_usePlotsServerAPI) {
         const result = await plotsApiRequest('POST', plotData);
         if (result && !result.error) {
-          window._savedPlots.push(result);
-        } else {
-          const plot = { ...plotData, id: Date.now(), savedAt: new Date().toISOString() };
-          window._savedPlots.push(plot);
+          window._savedPlots = mergePlots(
+            window._savedPlots.filter(plot => plot.id !== localPlot.id),
+            [result]
+          );
           writeLocalPlots(window._savedPlots);
+          renderSavedPlots();
+          savedMessage = `Saved area: ${name}`;
+        } else {
+          _usePlotsServerAPI = false;
+          savedMessage = `Saved locally only: ${name}`;
         }
-      } else {
-        const plot = { ...plotData, id: Date.now(), savedAt: new Date().toISOString() };
-        window._savedPlots.push(plot);
-        writeLocalPlots(window._savedPlots);
       }
 
-      renderSavedPlots();
-      status.textContent = `Saved area: ${name}`;
+      status.textContent = savedMessage;
       status.style.color = '#4CAF50';
       nameInput.value = '';
       noteInput.value = '';
@@ -2444,6 +3313,8 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
         </div>
         ${plot.note ? `<div class="saved-plot-note">${plot.note}</div>` : ''}
       `).join('');
+
+      if (!map || !map.isStyleLoaded()) return;
 
       window._savedPlots.forEach((plot) => {
         const srcId = `saved-plot-src-${plot.id}`;
@@ -2500,6 +3371,7 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
     async function editSavedPlot(index) {
       const plot = window._savedPlots[index];
       if (!plot) return;
+      const isLocalOnly = String(plot.id).startsWith('local-');
       const name = prompt('Area name:', plot.name);
       if (name === null) return;
       const note = prompt('Note:', plot.note || '');
@@ -2507,15 +3379,18 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
       plot.name = name || plot.name;
       plot.note = note || '';
 
-      if (_usePlotsServerAPI) await plotsApiRequest('PATCH', { name: plot.name, note: plot.note }, plot.id);
-      else writeLocalPlots(window._savedPlots);
+      if (_usePlotsServerAPI && !isLocalOnly) {
+        await plotsApiRequest('PATCH', { name: plot.name, note: plot.note }, plot.id);
+      }
+      writeLocalPlots(window._savedPlots);
       renderSavedPlots();
     }
 
     async function deleteSavedPlot(index) {
       const plot = window._savedPlots[index];
       if (!plot) return;
-      if (_usePlotsServerAPI) await plotsApiRequest('DELETE', null, plot.id);
+      const isLocalOnly = String(plot.id).startsWith('local-');
+      if (_usePlotsServerAPI && !isLocalOnly) await plotsApiRequest('DELETE', null, plot.id);
       else {
         window._savedPlots.splice(index, 1);
         writeLocalPlots(window._savedPlots);
@@ -2524,6 +3399,7 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
         return;
       }
       window._savedPlots = window._savedPlots.filter((_, i) => i !== index);
+      writeLocalPlots(window._savedPlots);
       removeSavedPlotLayers(plot.id);
       renderSavedPlots();
     }
@@ -2534,6 +3410,7 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
       else writeLocalPlots([]);
       window._savedPlots.forEach(plot => removeSavedPlotLayers(plot.id));
       window._savedPlots = [];
+      writeLocalPlots([]);
       renderSavedPlots();
     }
 
@@ -3580,6 +4457,830 @@ SPDD-001  Bob  672975  569515  -23.1  162.0" style="width:100%;padding:5px 8px;b
       if (areaMode) addAreaPoint(e.lngLat.lat, e.lngLat.lng);
       if (inspectMode) inspectPoint(e.lngLat.lat, e.lngLat.lng);
     });
+
+    /* ═════════════════════════════════════════════════════════════
+       MOBILE APP LOGIC — Google Maps / iOS Maps paradigm
+       Runs only when viewport ≤ 768px (or short landscape phone).
+       Reads & writes state through the existing hidden desktop inputs
+       (#toggle-confirmed etc.) so all backend logic stays shared.
+       ═════════════════════════════════════════════════════════════ */
+    (function initMobileApp() {
+      const mql = window.matchMedia(
+        '(max-width: 768px), (max-width: 950px) and (max-height: 500px)'
+      );
+      if (!mql.matches) return;
+
+      /* ---------- DOM refs ---------- */
+      const $app       = document.querySelector('.m-app');
+      const $sheet     = document.getElementById('m-sheet');
+      const $sheetBody = document.getElementById('m-sheet-body');
+      const $sheetTtl  = document.getElementById('m-sheet-title');
+      const $sheetBack = document.getElementById('m-sheet-back');
+      const $sheetClose= document.getElementById('m-sheet-close');
+      const $yearSlider= document.getElementById('m-yearbar-slider');
+      const $yearNum   = document.getElementById('m-yearbar-yr');
+      const $searchbar = document.getElementById('m-searchbar');
+      const $searchTxt = document.getElementById('m-searchbar-txt');
+      const $compass   = document.getElementById('m-btn-compass');
+      const $btn3d     = document.getElementById('m-btn-3d');
+      const $btnLoc    = document.getElementById('m-btn-locate');
+      const $mode      = document.getElementById('m-mode');
+      const $modeTtl   = document.getElementById('m-mode-ttl');
+      const $modeAct   = document.getElementById('m-mode-act');
+      const $modeBot   = document.getElementById('m-mode-bot');
+      const $modeX     = document.getElementById('m-mode-x');
+      const $placeCard = document.getElementById('m-placecard');
+      const $placeBody = document.getElementById('m-placecard-body');
+
+      /* ---------- State helpers ---------- */
+      const haptic = () => { try { if (navigator.vibrate) navigator.vibrate(5); } catch(e){} };
+      const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+      // Fire a change/input event on a hidden desktop input so its
+      // existing onchange handler runs.
+      function triggerChange(id, kind) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.dispatchEvent(new Event(kind || 'change', { bubbles: true }));
+      }
+      function setHidden(id, value) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (el.type === 'checkbox') { el.checked = !!value; triggerChange(id); }
+        else { el.value = value; triggerChange(id, 'input'); }
+      }
+      function getHidden(id) {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        return el.type === 'checkbox' ? el.checked : el.value;
+      }
+
+      /* ---------- Sheet page stack ---------- */
+      const pages = []; // [{id, title, render}]
+      function openSheet(pageId, opts) {
+        pages.length = 0;
+        pushPage(pageId, opts);
+        $sheet.classList.add('open');
+        haptic();
+      }
+      function pushPage(pageId, opts) {
+        const p = PAGES[pageId];
+        if (!p) return;
+        pages.push({ id: pageId, opts: opts || {} });
+        renderCurrent();
+      }
+      function popPage() {
+        if (pages.length <= 1) { closeSheet(); return; }
+        pages.pop();
+        renderCurrent();
+      }
+      function closeSheet() {
+        $sheet.classList.remove('open');
+      }
+      function renderCurrent() {
+        const cur = pages[pages.length - 1];
+        const p = PAGES[cur.id];
+        $sheetTtl.textContent = typeof p.title === 'function' ? p.title(cur.opts) : p.title;
+        $sheetBack.hidden = pages.length <= 1;
+        $sheetBody.scrollTop = 0;
+        $sheetBody.innerHTML = p.render(cur.opts) || '';
+        if (p.mount) p.mount(cur.opts);
+      }
+      $sheetBack.addEventListener('click', popPage);
+      $sheetClose.addEventListener('click', closeSheet);
+      $sheet.addEventListener('click', (e) => {
+        // Tap on backdrop closes
+        if (e.target === $sheet) closeSheet();
+      });
+
+      /* ---------- Page definitions ---------- */
+      const PAGES = {};
+
+      /* ----- PAGE: Layers (root) ----- */
+      PAGES.layers = {
+        title: 'Layers',
+        render() {
+          const bm = (typeof currentBasemap !== 'undefined' ? currentBasemap : 'satellite');
+          const detections = [
+            { id: 'confirmed', name: 'Confirmed Mining',   color: '#af2a2a', sub: 'MapBiomas',     detail: null },
+            { id: 'detected',  name: 'Detected Mining',    color: '#e6a817', sub: 'Sentinel-2',    detail: null },
+            { id: 'amw',       name: 'Amazon Mining Watch',color: '#2196F3', sub: 'AMW quarterly', detail: 'amw' },
+            { id: 'timeline',  name: 'Mining Timeline',    color: 'linear-gradient(to right,#1a237e,#b71c1c)', sub: '2018–2023', detail: null },
+          ];
+          const context = [
+            { id: 'landcover', name: 'Land Classification', color: 'linear-gradient(135deg,#006400,#b4b4b4,#0064c8)', sub: 'MapBiomas landcover', detail: 'landcover' },
+            { id: 'terrain-view', name: 'Terrain 3D',   color: '#8d6e63', sub: 'Hillshade + relief', detail: 'terrain' },
+            { id: 'historical-basemap', name: 'Historical Imagery', color: '#4caf50', sub: 'Landsat by year', detail: null },
+            { id: 'roads',     name: 'Roads',                color: '#777',     sub: 'OSM highways', detail: null },
+          ];
+          const maptypes = [
+            { id: 'satellite', name: 'Satellite', bg: 'linear-gradient(135deg,#2c5f2d,#97bc62)' },
+            { id: 'osm',       name: 'Street',    bg: 'linear-gradient(135deg,#e5e3df,#c9c5be)' },
+            { id: 'carto-dark',name: 'Dark',      bg: 'linear-gradient(135deg,#1a1a2e,#3d3d56)' },
+          ];
+
+          const tile = t => `
+            <button class="m-maptype ${bm===t.id?'active':''}" data-bm="${t.id}">
+              <div class="m-maptype-thumb" style="background:${t.bg}"></div>
+              <div class="m-maptype-lbl">${t.name}</div>
+            </button>`;
+          const row = l => `
+            <label class="m-row" data-layer="${l.id}">
+              <span class="m-row-ic" style="background:${l.color}"></span>
+              <span>
+                <div class="m-row-lbl">${l.name}</div>
+                <div class="m-row-sub">${l.sub}</div>
+              </span>
+              <span style="flex:1"></span>
+              ${l.detail ? `<span class="m-row-chev" data-detail="${l.detail}">›</span>` : ''}
+              <input type="checkbox" class="m-toggle" data-layer-toggle="${l.id}" ${getHidden('toggle-'+l.id)?'checked':''}>
+            </label>`;
+          const linkRow = (ic, lbl, page) => `
+            <div class="m-row" data-link="${page}">
+              <span class="m-row-ic" style="background:var(--m-fill)">${ic}</span>
+              <div class="m-row-lbl">${lbl}</div>
+              <span class="m-row-chev">›</span>
+            </div>`;
+
+          return `
+            <div class="m-section">Map type</div>
+            <div class="m-maptypes">${maptypes.map(tile).join('')}</div>
+
+            <div class="m-section">Mining detections</div>
+            <div class="m-group">${detections.map(row).join('')}</div>
+
+            <div class="m-section">Context</div>
+            <div class="m-group">${context.map(row).join('')}</div>
+
+            <div class="m-section">Tools</div>
+            <div class="m-group">
+              ${linkRow('📏', 'Measure distance', 'tool-ruler')}
+              ${linkRow('⬛', 'Measure area',     'tool-area')}
+              ${linkRow('🎬', 'Time-lapse',        'tool-timelapse')}
+              ${linkRow('↔',  'Compare',           'tool-compare')}
+            </div>
+
+            <div class="m-section">More</div>
+            <div class="m-group">
+              ${linkRow('🔖', 'Saved locations', 'saved-locations')}
+              ${linkRow('📐', 'Saved areas',     'saved-areas')}
+              ${linkRow('📥', 'Import DMS',      'import-dms')}
+              ${linkRow('📥', 'Import UTM',      'import-utm')}
+              ${linkRow('📖', 'Legend',          'legend')}
+            </div>
+            <div style="height:16px"></div>
+          `;
+        },
+        mount() {
+          // Map type clicks
+          $sheetBody.querySelectorAll('[data-bm]').forEach(btn => {
+            btn.addEventListener('click', () => {
+              const v = btn.getAttribute('data-bm');
+              const sel = document.getElementById('basemap-selector');
+              if (sel) { sel.value = v; triggerChange('basemap-selector'); }
+              else if (typeof onBasemapChange === 'function') onBasemapChange(v);
+              // refresh active state
+              $sheetBody.querySelectorAll('[data-bm]').forEach(b =>
+                b.classList.toggle('active', b.getAttribute('data-bm') === v));
+            });
+          });
+          // Layer toggles
+          $sheetBody.querySelectorAll('[data-layer-toggle]').forEach(cb => {
+            cb.addEventListener('change', (e) => {
+              e.stopPropagation();
+              const id = cb.getAttribute('data-layer-toggle');
+              setHidden('toggle-' + id, cb.checked);
+              haptic();
+            });
+          });
+          // Prevent the row click from toggling twice
+          $sheetBody.querySelectorAll('[data-layer]').forEach(row => {
+            row.addEventListener('click', (e) => {
+              if (e.target.matches('input, [data-detail]')) return;
+              const cb = row.querySelector('.m-toggle');
+              if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); }
+            });
+          });
+          // Detail chevrons
+          $sheetBody.querySelectorAll('[data-detail]').forEach(ch => {
+            ch.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const d = ch.getAttribute('data-detail');
+              pushPage(d);
+            });
+          });
+          // Link rows (tools / more)
+          $sheetBody.querySelectorAll('[data-link]').forEach(row => {
+            row.addEventListener('click', () => {
+              const p = row.getAttribute('data-link');
+              if (p.startsWith('tool-')) {
+                const tool = p.slice(5);
+                closeSheet();
+                setTimeout(() => startMode(tool), 300);
+              } else {
+                pushPage(p);
+              }
+            });
+          });
+        }
+      };
+
+      /* ----- PAGE: AMW detail ----- */
+      PAGES.amw = {
+        title: 'Amazon Mining Watch',
+        render() {
+          const opacity = +(getHidden('opacity-amw') || 70);
+          const mode = (typeof amwMode !== 'undefined' ? amwMode : 'cumulative');
+          const periods = (typeof AMW_ALL_PERIODS !== 'undefined' ? AMW_ALL_PERIODS : []);
+          const curPeriod = (typeof amwPeriod !== 'undefined' ? amwPeriod : (periods[periods.length-1] || ''));
+          return `
+            <div class="m-section">Opacity</div>
+            <div class="m-group">
+              <div class="m-slider-row">
+                <div class="m-slider-lbl"><span>Layer opacity</span><span class="m-slider-val" id="amw-op-val">${opacity}%</span></div>
+                <input type="range" id="m-amw-op" min="0" max="100" value="${opacity}">
+              </div>
+            </div>
+
+            <div class="m-section">Mode</div>
+            <div class="m-group" style="padding-bottom:6px">
+              <div class="m-seg">
+                <button class="m-seg-btn ${mode==='cumulative'?'active':''}" data-amw-mode="cumulative">Cumulative</button>
+                <button class="m-seg-btn ${mode==='single'?'active':''}" data-amw-mode="single">Single period</button>
+              </div>
+            </div>
+
+            <div class="m-section">Period <span style="color:var(--m-label);font-weight:700;letter-spacing:0">${curPeriod}</span></div>
+            <div class="m-group" style="padding:8px 0">
+              <div class="m-chips m-chips-scroll" id="m-amw-periods">
+                ${periods.map(p => `<button class="m-chip ${p===curPeriod?'active':''}" data-amw-p="${p}">${p}</button>`).join('')}
+              </div>
+            </div>
+            <div class="m-status" id="m-amw-status">${document.getElementById('amw-period-status')?.textContent || ''}</div>
+          `;
+        },
+        mount() {
+          const opIn = document.getElementById('m-amw-op');
+          const opLbl = document.getElementById('amw-op-val');
+          opIn?.addEventListener('input', () => {
+            opLbl.textContent = opIn.value + '%';
+            setHidden('opacity-amw', opIn.value);
+          });
+          $sheetBody.querySelectorAll('[data-amw-mode]').forEach(b => {
+            b.addEventListener('click', () => {
+              const m = b.getAttribute('data-amw-mode');
+              if (typeof setAMWMode === 'function') setAMWMode(m);
+              $sheetBody.querySelectorAll('[data-amw-mode]').forEach(x =>
+                x.classList.toggle('active', x.getAttribute('data-amw-mode') === m));
+              haptic();
+            });
+          });
+          $sheetBody.querySelectorAll('[data-amw-p]').forEach(b => {
+            b.addEventListener('click', () => {
+              const p = b.getAttribute('data-amw-p');
+              if (typeof setAMWPeriod === 'function') setAMWPeriod(p);
+              $sheetBody.querySelectorAll('[data-amw-p]').forEach(x =>
+                x.classList.toggle('active', x.getAttribute('data-amw-p') === p));
+              // refresh status
+              setTimeout(() => {
+                const s = document.getElementById('amw-period-status');
+                const ms = document.getElementById('m-amw-status');
+                if (s && ms) ms.textContent = s.textContent;
+              }, 300);
+              haptic();
+            });
+          });
+        }
+      };
+
+      /* ----- PAGE: Land Classification detail ----- */
+      PAGES.landcover = {
+        title: 'Land Classification',
+        render() {
+          const opacity = +(getHidden('opacity-landcover') || 75);
+          return `
+            <div class="m-section">Opacity</div>
+            <div class="m-group">
+              <div class="m-slider-row">
+                <div class="m-slider-lbl"><span>Layer opacity</span><span class="m-slider-val" id="lc-op-val">${opacity}%</span></div>
+                <input type="range" id="m-lc-op" min="0" max="100" value="${opacity}">
+              </div>
+            </div>
+            <div class="m-section">Year</div>
+            <div class="m-btn-row" style="padding:0 14px">
+              <button class="m-secondary-btn" id="m-lc-latest">Latest (2026)</button>
+              <button class="m-secondary-btn" id="m-lc-match">Match current year</button>
+            </div>
+            <div class="m-status" id="m-lc-status">${document.getElementById('landcover-status')?.textContent || ''}</div>
+            <div class="m-section">Legend</div>
+            <div class="m-group" style="padding:10px 14px;font-size:12px" id="m-lc-legend">
+              ${document.getElementById('landcover-legend')?.innerHTML || '<span style="color:var(--m-label3)">Enable layer to load</span>'}
+            </div>
+          `;
+        },
+        mount() {
+          const op = document.getElementById('m-lc-op');
+          const lbl = document.getElementById('lc-op-val');
+          op?.addEventListener('input', () => {
+            lbl.textContent = op.value + '%';
+            setHidden('opacity-landcover', op.value);
+          });
+          document.getElementById('m-lc-latest')?.addEventListener('click', () => {
+            if (typeof loadLandCover === 'function') loadLandCover(2026);
+          });
+          document.getElementById('m-lc-match')?.addEventListener('click', () => {
+            const y = typeof currentDetectionYear !== 'undefined' ? currentDetectionYear : 2025;
+            if (typeof loadLandCover === 'function') loadLandCover(y);
+          });
+        }
+      };
+
+      /* ----- PAGE: Terrain 3D detail ----- */
+      PAGES.terrain = {
+        title: 'Terrain 3D',
+        render() {
+          const mode = (typeof terrainViewMode !== 'undefined' ? terrainViewMode : 'hybrid');
+          const relief = +(getHidden('hillshade-intensity') || 50);
+          const exag = +(getHidden('hillshade-exaggeration') || 3);
+          return `
+            <div class="m-section">Display</div>
+            <div class="m-group" style="padding-bottom:6px">
+              <div class="m-seg">
+                <button class="m-seg-btn ${mode==='hybrid'?'active':''}" data-tv="hybrid">Hybrid</button>
+                <button class="m-seg-btn ${mode==='terrain'?'active':''}" data-tv="terrain">Terrain only</button>
+              </div>
+            </div>
+            <div class="m-section">Relief intensity</div>
+            <div class="m-group">
+              <div class="m-slider-row">
+                <div class="m-slider-lbl"><span>Strength</span><span class="m-slider-val" id="tv-relief-val">${relief}%</span></div>
+                <input type="range" id="m-tv-relief" min="0" max="100" value="${relief}">
+              </div>
+            </div>
+            <div class="m-section">Exaggeration</div>
+            <div class="m-group">
+              <div class="m-slider-row">
+                <div class="m-slider-lbl"><span>Vertical scale</span><span class="m-slider-val" id="tv-ex-val">${exag}x</span></div>
+                <input type="range" id="m-tv-ex" min="1" max="8" step="0.5" value="${exag}">
+              </div>
+            </div>
+          `;
+        },
+        mount() {
+          $sheetBody.querySelectorAll('[data-tv]').forEach(b => {
+            b.addEventListener('click', () => {
+              const v = b.getAttribute('data-tv');
+              if (typeof setTerrainViewMode === 'function') setTerrainViewMode(v);
+              $sheetBody.querySelectorAll('[data-tv]').forEach(x =>
+                x.classList.toggle('active', x.getAttribute('data-tv') === v));
+            });
+          });
+          const r = document.getElementById('m-tv-relief');
+          r?.addEventListener('input', () => {
+            document.getElementById('tv-relief-val').textContent = r.value + '%';
+            setHidden('hillshade-intensity', r.value);
+          });
+          const e = document.getElementById('m-tv-ex');
+          e?.addEventListener('input', () => {
+            document.getElementById('tv-ex-val').textContent = e.value + 'x';
+            setHidden('hillshade-exaggeration', e.value);
+          });
+        }
+      };
+
+      /* ----- PAGE: Search ----- */
+      PAGES.search = {
+        title: 'Search',
+        render() {
+          const saved = (typeof loadSavedLocationsFromStore === 'function' ? loadSavedLocationsFromStore() : (JSON.parse(localStorage.getItem('savedLocations')||'[]')));
+          const savedHtml = saved.length ? saved.map((loc, i) => `
+            <div class="m-row" data-saved-i="${i}">
+              <span class="m-row-ic" style="background:${loc.color||'#007aff'};color:#fff">📍</span>
+              <div style="flex:1;min-width:0">
+                <div class="m-row-lbl" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(loc.name)}</div>
+                <div class="m-row-sub">${loc.lat.toFixed(4)}, ${loc.lon.toFixed(4)}</div>
+              </div>
+              <span class="m-row-chev">›</span>
+            </div>`).join('') : '<div class="m-empty">No saved locations yet</div>';
+          return `
+            <div style="padding:4px 0 10px">
+              <input class="m-input" id="m-search-in" type="text" placeholder="Search place name…" autofocus>
+            </div>
+            <div id="m-search-results"></div>
+
+            <div class="m-section">Jump to coordinates</div>
+            <div class="m-group" style="padding:12px 14px">
+              <div style="display:flex;gap:8px">
+                <input class="m-input" id="m-jump-lat" placeholder="Lat"  style="flex:1">
+                <input class="m-input" id="m-jump-lon" placeholder="Lon"  style="flex:1">
+              </div>
+              <button class="m-primary-btn" id="m-jump-go">Go</button>
+            </div>
+
+            <div class="m-section">Saved locations</div>
+            <div class="m-group">${savedHtml}</div>
+          `;
+        },
+        mount() {
+          const input = document.getElementById('m-search-in');
+          input?.focus();
+          let tmr;
+          input?.addEventListener('input', () => {
+            const real = document.getElementById('search-input');
+            if (real) real.value = input.value;
+            clearTimeout(tmr);
+            tmr = setTimeout(() => {
+              if (typeof searchPlace === 'function') searchPlace();
+              setTimeout(() => {
+                const r = document.getElementById('search-results');
+                const mr = document.getElementById('m-search-results');
+                if (r && mr) mr.innerHTML = r.innerHTML;
+              }, 600);
+            }, 400);
+          });
+          input?.addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+              const real = document.getElementById('search-input');
+              if (real) { real.value = input.value; if (typeof searchPlace==='function') searchPlace(); }
+              setTimeout(() => {
+                const r = document.getElementById('search-results');
+                const mr = document.getElementById('m-search-results');
+                if (r && mr) mr.innerHTML = r.innerHTML;
+              }, 600);
+            }
+          });
+          document.getElementById('m-jump-go')?.addEventListener('click', () => {
+            const la = document.getElementById('m-jump-lat').value;
+            const lo = document.getElementById('m-jump-lon').value;
+            document.getElementById('coord-lat').value = la;
+            document.getElementById('coord-lon').value = lo;
+            if (typeof goToCoords === 'function') goToCoords();
+            closeSheet();
+          });
+          $sheetBody.querySelectorAll('[data-saved-i]').forEach(el => {
+            el.addEventListener('click', () => {
+              const i = +el.getAttribute('data-saved-i');
+              if (typeof flyToSaved === 'function') flyToSaved(i);
+              closeSheet();
+            });
+          });
+        }
+      };
+
+      /* ----- PAGE: Saved Locations ----- */
+      PAGES['saved-locations'] = {
+        title: 'Saved Locations',
+        render() {
+          const saved = JSON.parse(localStorage.getItem('savedLocations')||'[]');
+          const html = saved.length ? saved.map((loc, i) => `
+            <div class="m-row" data-saved-i="${i}">
+              <span class="m-row-ic" style="background:${loc.color||'#007aff'};color:#fff">📍</span>
+              <div style="flex:1;min-width:0">
+                <div class="m-row-lbl" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(loc.name)}</div>
+                <div class="m-row-sub">${loc.lat.toFixed(5)}, ${loc.lon.toFixed(5)}</div>
+              </div>
+              <button data-del-i="${i}" style="border:none;background:transparent;color:var(--m-red);font-size:18px;padding:8px" aria-label="Delete">🗑</button>
+            </div>`).join('') : '<div class="m-empty">No saved locations yet</div>';
+          return `
+            <div class="m-group">${html}</div>
+            <div class="m-btn-row">
+              <button class="m-secondary-btn" id="m-dl-saved">Download</button>
+              <button class="m-secondary-btn m-danger-btn" id="m-clr-saved">Clear all</button>
+            </div>
+          `;
+        },
+        mount() {
+          $sheetBody.querySelectorAll('[data-saved-i]').forEach(el => {
+            el.addEventListener('click', (e) => {
+              if (e.target.matches('[data-del-i]')) return;
+              const i = +el.getAttribute('data-saved-i');
+              if (typeof flyToSaved === 'function') flyToSaved(i);
+              closeSheet();
+            });
+          });
+          $sheetBody.querySelectorAll('[data-del-i]').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              const i = +btn.getAttribute('data-del-i');
+              if (typeof deleteSaved === 'function') deleteSaved(i);
+              renderCurrent();
+            });
+          });
+          document.getElementById('m-dl-saved')?.addEventListener('click', () => {
+            if (typeof downloadSaved === 'function') downloadSaved();
+          });
+          document.getElementById('m-clr-saved')?.addEventListener('click', () => {
+            if (typeof clearAllSaved === 'function') { clearAllSaved(); renderCurrent(); }
+          });
+        }
+      };
+
+      /* ----- PAGE: Saved Areas ----- */
+      PAGES['saved-areas'] = {
+        title: 'Saved Areas',
+        render() {
+          const html = document.getElementById('saved-plots-list')?.innerHTML || '';
+          return `<div class="m-group" id="m-sa-list" style="padding:4px 0">${html || '<div class="m-empty">No saved areas yet</div>'}</div>
+            <div class="m-btn-row">
+              <button class="m-secondary-btn" id="m-dl-sa">Download</button>
+              <button class="m-secondary-btn m-danger-btn" id="m-clr-sa">Clear all</button>
+            </div>`;
+        },
+        mount() {
+          document.getElementById('m-dl-sa')?.addEventListener('click', () => {
+            if (typeof downloadSavedPlots === 'function') downloadSavedPlots();
+          });
+          document.getElementById('m-clr-sa')?.addEventListener('click', () => {
+            if (typeof clearAllSavedPlots === 'function') { clearAllSavedPlots(); renderCurrent(); }
+          });
+        }
+      };
+
+      /* ----- PAGE: Import DMS ----- */
+      PAGES['import-dms'] = {
+        title: 'Import DMS',
+        render() {
+          return `
+            <div class="m-section">Paste DMS points</div>
+            <textarea class="m-textarea" id="m-dms-input" placeholder="A. 5° 9' 41.42&quot;
+B. 5° 9' 41.13&quot;
+55° 26' 28.40&quot; W"></textarea>
+            <input class="m-input" id="m-dms-name" placeholder="Area name" style="margin-top:8px">
+            <input class="m-input" id="m-dms-note" placeholder="Note (optional)" style="margin-top:8px">
+            <button class="m-primary-btn" id="m-dms-go">Import & Plot</button>
+            <div class="m-btn-row">
+              <button class="m-secondary-btn" id="m-dms-norm">Normalize</button>
+              <button class="m-secondary-btn" id="m-dms-ai">Copy AI prompt</button>
+            </div>
+            <button class="m-secondary-btn" id="m-dms-save" style="margin-top:8px;background:#fffcd9;color:#7a6200">Save area</button>
+            <button class="m-secondary-btn m-danger-btn" id="m-dms-clr">Clear plot</button>
+            <div class="m-status" id="m-dms-status"></div>
+          `;
+        },
+        mount() {
+          const sync = () => {
+            document.getElementById('dms-input').value = document.getElementById('m-dms-input').value;
+            document.getElementById('dms-name').value  = document.getElementById('m-dms-name').value;
+            document.getElementById('dms-note').value  = document.getElementById('m-dms-note').value;
+          };
+          document.getElementById('m-dms-go')?.addEventListener('click', () => { sync(); if (typeof importDMS==='function') importDMS(); setTimeout(()=>document.getElementById('m-dms-status').textContent = document.getElementById('dms-status').textContent, 200); });
+          document.getElementById('m-dms-norm')?.addEventListener('click', () => { sync(); if (typeof normalizeCoordinateInput==='function') normalizeCoordinateInput(); document.getElementById('m-dms-input').value = document.getElementById('dms-input').value; });
+          document.getElementById('m-dms-ai')?.addEventListener('click', () => { sync(); if (typeof copyCoordinateAIPrompt==='function') copyCoordinateAIPrompt(); });
+          document.getElementById('m-dms-save')?.addEventListener('click', () => { sync(); if (typeof saveCurrentPlot==='function') saveCurrentPlot(); });
+          document.getElementById('m-dms-clr')?.addEventListener('click', () => { if (typeof clearPlot==='function') clearPlot(); });
+        }
+      };
+
+      /* ----- PAGE: Import UTM ----- */
+      PAGES['import-utm'] = {
+        title: 'Import UTM Drill Holes',
+        render() {
+          return `
+            <div class="m-section">Paste UTM data</div>
+            <textarea class="m-textarea" id="m-utm-input" placeholder="Hole ID  Target  Easting  Northing  Elev  EOH
+SPDD-001  Bob  672975  569515  -23.1  162.0"></textarea>
+            <div style="display:flex;gap:8px;margin-top:10px;align-items:center">
+              <label style="flex:1;font-size:13px;color:var(--m-label2)">
+                Zone
+                <input class="m-input" id="m-utm-zone" type="number" min="1" max="60" value="21" style="margin-top:4px">
+              </label>
+              <label style="flex:1;font-size:13px;color:var(--m-label2);display:flex;align-items:center;gap:8px;padding-top:18px">
+                <input type="checkbox" id="m-utm-north" checked style="width:20px;height:20px">
+                Northern hemisphere
+              </label>
+            </div>
+            <button class="m-primary-btn" id="m-utm-go">Import & Plot</button>
+            <button class="m-secondary-btn m-danger-btn" id="m-utm-clr">Clear</button>
+            <div class="m-status" id="m-utm-status"></div>
+          `;
+        },
+        mount() {
+          document.getElementById('m-utm-go')?.addEventListener('click', () => {
+            document.getElementById('utm-input').value = document.getElementById('m-utm-input').value;
+            document.getElementById('utm-zone').value  = document.getElementById('m-utm-zone').value;
+            document.getElementById('utm-north').checked = document.getElementById('m-utm-north').checked;
+            if (typeof importUTM==='function') importUTM();
+            setTimeout(()=>document.getElementById('m-utm-status').textContent = document.getElementById('utm-status').textContent, 200);
+          });
+          document.getElementById('m-utm-clr')?.addEventListener('click', () => { if (typeof clearDrillHoles==='function') clearDrillHoles(); });
+        }
+      };
+
+      /* ----- PAGE: Legend ----- */
+      PAGES.legend = {
+        title: 'Legend',
+        render() {
+          return `
+            <div class="m-group" style="padding:10px 14px">
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 0"><span style="width:16px;height:16px;border-radius:4px;background:#af2a2a"></span> Confirmed mining <span style="margin-left:auto;font-size:11px;color:var(--m-label3)">MapBiomas</span></div>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 0"><span style="width:16px;height:16px;border-radius:4px;background:#e6a817"></span> Detected mining <span style="margin-left:auto;font-size:11px;color:var(--m-label3)">Sentinel-2</span></div>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 0"><span style="width:16px;height:16px;border-radius:4px;background:linear-gradient(to right,#FFF9C4,#FFD54F,#EF5350)"></span> AI Mining (AMW) <span style="margin-left:auto;font-size:11px;color:var(--m-label3)">old → new</span></div>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 0"><span style="width:16px;height:16px;border-radius:4px;background:linear-gradient(to right,#1a237e,#b71c1c)"></span> Mining Timeline <span style="margin-left:auto;font-size:11px;color:var(--m-label3)">2018–23</span></div>
+            </div>
+          `;
+        }
+      };
+
+      /* ---------- Year slider ---------- */
+      function syncYearUI(val) {
+        $yearNum.textContent = val;
+        const pct = ((val - 2018) / (2026 - 2018)) * 100;
+        $yearSlider.style.setProperty('--yr-pct', pct + '%');
+      }
+      $yearSlider.addEventListener('input', () => {
+        syncYearUI($yearSlider.value);
+      });
+      $yearSlider.addEventListener('change', () => {
+        // Forward to the real year control
+        const real = document.getElementById('year-slider');
+        if (real) { real.value = $yearSlider.value; triggerChange('year-slider', 'input'); }
+      });
+
+      /* ---------- Nav buttons ---------- */
+      document.getElementById('m-btn-layers').addEventListener('click', () => openSheet('layers'));
+      $searchbar.addEventListener('click', () => openSheet('search'));
+      $searchbar.addEventListener('keydown', e => { if (e.key==='Enter' || e.key===' ') openSheet('search'); });
+
+      $btnLoc.addEventListener('click', () => {
+        if (!navigator.geolocation) return;
+        $btnLoc.classList.add('on');
+        navigator.geolocation.getCurrentPosition(
+          pos => {
+            map.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: 14, duration: 1200 });
+            setTimeout(() => $btnLoc.classList.remove('on'), 1200);
+          },
+          () => $btnLoc.classList.remove('on'),
+          { enableHighAccuracy: true, timeout: 8000 }
+        );
+      });
+
+      $btn3d.addEventListener('click', () => {
+        const cb = document.getElementById('toggle-3d');
+        if (!cb) return;
+        cb.checked = !cb.checked;
+        triggerChange('toggle-3d');
+        $btn3d.classList.toggle('on', cb.checked);
+        haptic();
+      });
+
+      $compass.addEventListener('click', () => {
+        map.easeTo({ bearing: 0, pitch: 0, duration: 500 });
+      });
+      map.on('rotate', () => {
+        const b = map.getBearing();
+        $compass.hidden = Math.abs(b) < 1;
+        $compass.style.transform = `rotate(${-b}deg)`;
+      });
+      map.on('pitch', () => {
+        const b = map.getBearing(), p = map.getPitch();
+        if (Math.abs(b) >= 1 || p >= 1) $compass.hidden = false;
+      });
+
+      /* ---------- Mode takeover ---------- */
+      let activeMode = null;
+      function startMode(name) {
+        activeMode = name;
+        $mode.classList.add('show');
+        if (name === 'ruler') {
+          $modeTtl.textContent = 'Measure distance';
+          $modeAct.textContent = 'Undo';
+          $modeBot.innerHTML = `
+            <div class="m-mode-val" id="m-mode-val">0.00 m</div>
+            <div class="m-mode-hint">Tap the map to add points</div>
+            <div class="m-btn-row">
+              <button class="m-secondary-btn" id="m-mode-clear">Clear</button>
+              <button class="m-primary-btn" id="m-mode-done" style="margin-top:0">Done</button>
+            </div>`;
+          setHidden('toggle-ruler', true);
+          setupModeButtons();
+        } else if (name === 'area') {
+          $modeTtl.textContent = 'Measure area';
+          $modeAct.textContent = 'Undo';
+          $modeBot.innerHTML = `
+            <div class="m-mode-val" id="m-mode-val">0 ha</div>
+            <div class="m-mode-hint">Tap the map to outline the area</div>
+            <div class="m-btn-row">
+              <button class="m-secondary-btn" id="m-mode-clear">Clear</button>
+              <button class="m-primary-btn" id="m-mode-done" style="margin-top:0">Done</button>
+            </div>`;
+          setHidden('toggle-area', true);
+          setupModeButtons();
+        } else if (name === 'timelapse') {
+          $modeTtl.textContent = 'Time-lapse';
+          $modeAct.textContent = '';
+          $modeBot.innerHTML = `
+            <div class="m-mode-hint">Drag to draw the area for time-lapse animation</div>
+            <button class="m-secondary-btn" id="m-mode-done">Cancel</button>`;
+          if (typeof startTimelapse === 'function') startTimelapse();
+          setupModeButtons();
+        } else if (name === 'compare') {
+          $modeTtl.textContent = 'Compare';
+          $modeAct.textContent = '';
+          $modeBot.innerHTML = `
+            <div class="m-mode-hint">Drag the divider to compare periods</div>
+            <button class="m-secondary-btn" id="m-mode-done">Exit</button>`;
+          if (typeof startSwipe === 'function') startSwipe();
+          setupModeButtons();
+        }
+      }
+      function exitMode() {
+        if (!activeMode) return;
+        if (activeMode === 'ruler') setHidden('toggle-ruler', false);
+        if (activeMode === 'area')  setHidden('toggle-area',  false);
+        if (activeMode === 'timelapse' && typeof stopTimelapse==='function') stopTimelapse();
+        if (activeMode === 'compare' && typeof stopSwipe==='function') stopSwipe();
+        activeMode = null;
+        $mode.classList.remove('show');
+      }
+      function setupModeButtons() {
+        document.getElementById('m-mode-clear')?.addEventListener('click', () => {
+          if (activeMode==='ruler' && typeof clearRuler==='function') clearRuler();
+          if (activeMode==='area'  && typeof clearArea==='function')  clearArea();
+        });
+        document.getElementById('m-mode-done')?.addEventListener('click', exitMode);
+      }
+      $modeX.addEventListener('click', exitMode);
+      $modeAct.addEventListener('click', () => {
+        // Undo last point (ruler/area)
+        if (activeMode==='ruler' && typeof undoRuler==='function') undoRuler();
+        if (activeMode==='area'  && typeof undoArea==='function')  undoArea();
+      });
+
+      // Poll the ruler/area result element while in mode and mirror value
+      setInterval(() => {
+        if (!activeMode) return;
+        const srcId = activeMode === 'ruler' ? 'ruler-result' : activeMode === 'area' ? 'area-result' : null;
+        if (srcId) {
+          const src = document.getElementById(srcId);
+          const dst = document.getElementById('m-mode-val');
+          if (src && dst) dst.textContent = src.textContent || (activeMode==='ruler'?'0.00 m':'0 ha');
+        }
+      }, 400);
+
+      /* ---------- Place card (inspect) ---------- */
+      // Always enable inspect-on-tap on mobile (no explicit toggle).
+      // If inspect mode isn't on, we still show a minimal coordinate card.
+      function showPlaceCard(html) {
+        $placeBody.innerHTML = html + `
+          <div class="m-btn-row">
+            <button class="m-secondary-btn" id="m-pc-close">Close</button>
+            <button class="m-primary-btn" id="m-pc-save" style="margin-top:0">📌 Save</button>
+          </div>`;
+        $placeCard.classList.add('show');
+        requestAnimationFrame(() => $placeCard.classList.add('open'));
+        document.getElementById('m-pc-close')?.addEventListener('click', hidePlaceCard);
+        document.getElementById('m-pc-save')?.addEventListener('click', () => {
+          // Forward to a fake save prompt? For now use the existing save flow:
+          if (typeof saveCurrentLocation === 'function') saveCurrentLocation();
+        });
+      }
+      function hidePlaceCard() {
+        $placeCard.classList.remove('open');
+        setTimeout(() => $placeCard.classList.remove('show'), 300);
+      }
+      // Listen to map clicks; if inspect mode off, show a light coord card
+      map.on('click', e => {
+        if (activeMode) return; // ruler/area already handling clicks
+        const lat = e.lngLat.lat, lng = e.lngLat.lng;
+        if (typeof inspectMode !== 'undefined' && inspectMode) {
+          // Existing inspectPoint builds a MapLibre popup; in addition
+          // we mirror into the place card for a native-looking UI.
+          setTimeout(() => {
+            const pop = document.querySelector('.maplibregl-popup-content');
+            if (pop) {
+              const mirror = pop.querySelector('.inspect-popup')?.innerHTML || pop.innerHTML;
+              showPlaceCard(mirror);
+            }
+          }, 300);
+        } else {
+          showPlaceCard(`
+            <h3 style="margin:4px 0 4px;font-size:17px;font-weight:600">Coordinate</h3>
+            <div style="color:var(--m-label3);font-size:13px;font-variant-numeric:tabular-nums">${lat.toFixed(5)}, ${lng.toFixed(5)}</div>
+          `);
+        }
+      });
+
+      /* ---------- Initial sync ---------- */
+      // Mirror existing year value
+      const realYear = document.getElementById('year-slider');
+      if (realYear) {
+        $yearSlider.value = realYear.value;
+        syncYearUI(realYear.value);
+        // If the real slider changes elsewhere, mirror back
+        realYear.addEventListener('input', () => {
+          $yearSlider.value = realYear.value;
+          syncYearUI(realYear.value);
+        });
+      }
+      // Always have inspect mode on for mobile (tapping gives info)
+      // (User can still get a basic coord card if inspectPoint isn't available.)
+
+      // Disable double-tap zoom on nav buttons
+      ['m-btn-layers','m-btn-locate','m-btn-3d','m-btn-compass'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.touchAction = 'manipulation';
+      });
+    })();
   </script>
 </body>
 </html>
